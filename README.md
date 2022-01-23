@@ -14,7 +14,7 @@ I want this project to be the best I can possibly make it. The move over to Vue 
 On top of porting over everything to Vue I need to actually finish the project so this will not be finished any time soon.
 
 ### Planned features & features took from the original project.
-* Ios & Android support through Ionic Capacitor.
+* iOS & Android support through Ionic Capacitor.
 * Functional Bolus Calculator.
 * Custom dosage modifiers.
 * Sickness calculations.
