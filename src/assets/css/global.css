@@ -1,0 +1,102 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Ubuntu');
+
+:root {
+    /* Colours */
+    --action-colour: #ef4d5a;
+    --action-colour-darker: #530209;
+
+    --main-bg-colour: #313131;
+    --secondary-bg-colour: #2a2a2a;
+    --tertiary-colour: #3d3d3d;
+    --quaternary-colour: #4b4b4b;
+
+    --text-colour-main: #e0e0e0;
+
+    /* Root Component Transforms */
+    --actionBarHeight: 17.5vh;
+    --margin: 1.25vh;
+    
+    --content-height: calc((100vh - var(--actionBarHeight)) - calc(var(--margin) * 2) ); /* Main height perfectly fits by taking the remaining height left from the height of the actionBar and margins */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    background-color: var(--secondary-bg-colour);
+    min-height: var(--content-height);
+    margin: 0 var(--margin);
+}
+
+.lockScroll { /* prevent main from scrolling */
+    max-height: var(--content-height);
+    overflow-y:hidden;
+}
+
+/* 
+.greyTop {
+    border-top: solid 5px var(--tertiary-colour);
+} */
+
+body {
+    background-color: var(--main-bg-colour);
+    overflow-x: hidden;
+
+    color: var(--text-colour-main);
+    font-family: 'Montserrat', sans-serif;
+}
+
+h1 {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: lighter;
+
+    margin-bottom: 20px;
+}
+
+h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: lighter;
+
+    margin-bottom: 20px;
+}
+
+.horizCentre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Vue Animations */
+
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+.fade-enter-to, .fade-leave-from {
+    opacity: 1;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: all 0.4s ease;
+}
+.slide-enter-from, .slide-leave-to {
+    transform: translateY(100%) 
+}
+.slide-enter-to, .slide-leave-from {
+    transform: translateY(0) 
+}
+.slide-enter-active, .slide-leave-active {
+    transition: all 0.5s ease;
+}
