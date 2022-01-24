@@ -1,6 +1,6 @@
 <template>
     <div class="optionBox" :class="{horizCentre:centre}">
-        <div class="optionTitle">
+        <div v-if="title" class="optionTitle">
             <h4>{{ title }}</h4>
         </div>
         <div>

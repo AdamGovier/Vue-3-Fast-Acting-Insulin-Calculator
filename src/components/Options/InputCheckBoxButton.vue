@@ -1,6 +1,6 @@
 <template>
     <div class="InputCheckBoxButton">
-        <label @click="this.$emit('handleClick', checkbox.name)">
+        <label @mouseup="this.$emit('handleClick', checkbox.name)">
             <input type="checkbox" @click.prevent="" :checked="checkbox.checked">
             <span>{{ checkbox.name }}</span>
         </label>

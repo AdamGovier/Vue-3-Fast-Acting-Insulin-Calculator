@@ -1,5 +1,5 @@
 <template>
-    <section class="horizCentre">
+    <section class="horizCentre modifierManager">
         <div @click="deleteMod()" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
             <MenuItem title="Remove Modifier" icon="far fa-trash-alt" slimline="true" /> 
@@ -26,7 +26,7 @@
             </Option>
             
             <!-- Key for rerendering the option. -->
-            <Option title="Blood Sugar Unit" centre="true"  :key="values.percentage"> 
+            <Option centre="true" :key="values.percentage"> 
                 <InputCheckboxRadio @selected="
                     selected => selected === `Add ${values.percentage ? values.percentage : 0}%` ? values.addition = true : values.addition = false
                 " button="true" :checkboxes="[
@@ -44,12 +44,21 @@
             <div class="horizCentre" style="margin-top: 20px;">
                 <InputCheckbox @handleClick="scheduled = !scheduled" :checkbox="{name:'Schedule Automatically', checked:scheduled}"/>
 
+                <ModifierScheduler @updated="scheduler => values.scheduler = scheduler" v-if="scheduled" />
+
                 <BtnPrimary @click="save();" value="Save" />
             </div>
+            
 
         </div>
     </section>
 </template>
+
+<style>
+    .modifierManager .optionBox:nth-child(3) {
+        margin: 10px;
+    }
+</style>
 
 <script>
 import MenuItem from "../../menu/MenuItem.vue";
@@ -64,7 +73,10 @@ import InputCheckboxRadio from '../../Options/InputCheckboxRadio.vue';
 import InputCheckbox from '../../Options/InputCheckbox.vue';
 import BtnPrimary from '../../Buttons/Primary.vue';
 
+import ModifierScheduler from '../../Other/ModifierScheduler.vue';
+
 import { v4 as uuidv4 } from 'uuid';
+
 export default {
     components: {
         MenuItem,
@@ -76,7 +88,8 @@ export default {
         OptionLabel,
         InputCheckboxRadio,
         InputCheckbox,
-        BtnPrimary
+        BtnPrimary,
+        ModifierScheduler
     },
     props: ['edit'],
     data() {
@@ -85,7 +98,8 @@ export default {
             values: {
                 modifierName: null,
                 percentage: null,
-                addition: false // Addition=true to add percentage to dose or =false to deduct
+                addition: false, // Addition=true to add percentage to dose or =false to deduct
+                scheduler: null
             }
         }
     },
@@ -119,6 +133,7 @@ export default {
                     name: this.values.modifierName,
                     percentage: this.values.percentage,
                     addition: this.values.addition,
+                    scheduler: this.values.scheduler,
                     id: uuidv4() // Used to identify the modifier for purposes such as editing them and using them.
                 })
 
