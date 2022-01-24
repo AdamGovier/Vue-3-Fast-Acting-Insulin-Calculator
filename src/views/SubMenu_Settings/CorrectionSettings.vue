@@ -16,7 +16,7 @@
                 ]" />
             </Option>
             <br/>
-            <!-- This makes the user aware that values have been converted. -->
+            <!-- This makes the user aware that values have been converted. Intentionally put outside of the Option component. -->
             <InputError v-if="errors.conversionMessage" :value="errors.conversionMessage" /> 
             <Option title="Correction Factor">
                 <InputError :value="errors.correctionFactor" v-if="errors.correctionFactor" />

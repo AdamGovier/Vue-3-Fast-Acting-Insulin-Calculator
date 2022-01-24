@@ -1,14 +1,17 @@
 <template>
-    <div class="mod-container">
+    <div class="mod-container" :class="{active:active}">
             <p>{{ value }}</p>
-            <p>{{symbol}} {{percentage}}%</p>
-            <i v-if="scheduled" class="far fa-clock"></i>
+            <p>
+                {{symbol}}{{percentage}}%
+            </p>
+            <span v-if="scheduled" style="text-align: right;">[ {{ scheduled }} ]</span>
+
     </div>
 </template>
 
 <script>
 export default {
-    props: ['value', 'scheduled', 'percentage', 'addition'],
+    props: ['value', 'scheduled', 'percentage', 'addition', 'active'],
     computed: {
         symbol() { // Choose which operator to render to the modifier block.
             return this.addition ? '+' : '-';
@@ -39,6 +42,10 @@ export default {
 
     border-radius: 4px;
 
+}
+
+.mod-container.active {
+    background-color: var(--action-colour);
 }
 
 .mod-container * {

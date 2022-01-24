@@ -1,10 +1,15 @@
 <template>
-    <button class="inputButton" type="button">{{ value }}</button>
+    <button class="inputButton" type="button">
+        <span v-if="value">
+            {{ value }}
+        </span>
+        <i v-if="icon" :class="icon"></i>
+    </button>
 </template>
 
 <script>
 export default {
-    props: ['value']
+    props: ['value', 'icon']
 }
 </script>
 
