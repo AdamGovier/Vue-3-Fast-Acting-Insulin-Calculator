@@ -7,13 +7,17 @@
 
         <span class="itemHeader">Modifiers</span>
         <div class="modifierHolder">
-            <ModiferBlock value="Exercise" percentage="10" :addition="false" />
-            <ModiferBlock value="Tesco" percentage="25" :addition="false" active="true" />
+            <div v-for="modifier in modifiers">
+                <ModiferBlock v-if="!modifier.today" @click="modifier.checked = !modifier.checked" :active="modifier.checked" :value="modifier.name" :percentage="modifier.percentage" :addition="modifier.addition" />
+
+            </div>
         </div>
 
-        <span class="itemHeader">Scheduled Modifiers</span>
+        <span class="itemHeader">Todays Scheduled Modifiers</span>
         <div class="modifierHolder">
-            <ModiferBlock value="Exercise" scheduled="10:00 - 17:30" percentage="10" :addition="false" />
+            <div v-for="modifier in modifiers">
+                <ModiferBlock v-if="modifier.today" @click="modifier.checked = !modifier.checked" :active="modifier.checked" :value="modifier.name" :percentage="modifier.percentage" :addition="modifier.addition" :scheduled="`[ ${modifier.scheduler.timeStart_hhmm} - ${modifier.scheduler.timeEnd_hhmm} ]`" />
+            </div>
         </div>
     </section>
 </template>
@@ -26,6 +30,11 @@
 
     .modifierHolder {
         width: 90%;
+        margin-top: 12.5px;
+    }
+
+    .modifierHolder .mod-container {
+        margin: 15px 0;
     }
 </style>
 
@@ -37,6 +46,19 @@ export default {
     components: {
         MenuItem,
         ModiferBlock
+    },
+    props: ['modifierList'],
+    data() {
+        return {
+            useModifiers: {},
+            modifiers: []
+        }
+    },
+    mounted() {
+        this.modifiers = this.modifierList;
+    },
+    updated() {
+        this.$emit('update', this.modifiers)
     }
 }
 </script>

@@ -44,7 +44,7 @@
             <div class="horizCentre" style="margin-top: 20px;">
                 <InputCheckbox @handleClick="scheduled = !scheduled" :checkbox="{name:'Schedule Automatically', checked:scheduled}"/>
 
-                <ModifierScheduler @updated="scheduler => values.scheduler = scheduler" v-if="scheduled" />
+                <ModifierScheduler :selected="values.scheduler" @updated="scheduler => values.scheduler = scheduler" v-if="scheduled" />
 
                 <BtnPrimary @click="save();" value="Save" />
             </div>
@@ -99,9 +99,12 @@ export default {
                 modifierName: null,
                 percentage: null,
                 addition: false, // Addition=true to add percentage to dose or =false to deduct
-                scheduler: null
+                scheduler: false
             }
         }
+    },
+    updated() {
+        if(!this.scheduled) this.values.scheduler = false;
     },
     mounted() {
         if(this.edit) {
@@ -112,6 +115,9 @@ export default {
             this.values.modifierName = modifier.name;
             this.values.percentage = modifier.percentage;
             this.values.addition = modifier.addition;
+            
+            this.values.scheduler = modifier.scheduler;
+            if(this.values.scheduler) this.scheduled = true;
         }
     },
     methods: {
@@ -153,7 +159,7 @@ export default {
                         modifiers = JSON.parse(storage.getItem('app_modifiers_json'));
                     }
 
-                    modifiers = modifiers.filter(modifier => modifier.id !== this.edit);
+                    modifiers = modifiers.filter(modifier => modifier.id !== this.edit); // delete modifier.
 
                     storage.setItem('app_modifiers_json', JSON.stringify(modifiers));
 

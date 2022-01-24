@@ -8,8 +8,8 @@
             Modifiers allow you to adapt your bolus dosage to different occasions. You can click any of your modifiers to edit them. 
         </p>
         
-        <div class="horizCentre">
-            <ModifierBlock v-for="modifier in modifiers" @click="edit = modifier.id; panels.modifierManager = true;" :value="modifier.name" :percentage="modifier.percentage" :addition="modifier.addition" />
+        <div class="horizCentre" style="margin-top: 20px">
+            <ModifierBlock v-for="modifier in modifiers" @click="edit = modifier.id; panels.modifierManager = true;" :value="modifier.name" :percentage="modifier.percentage" :addition="modifier.addition" :clock="modifier.scheduler" />
         </div>
 
         <BtnSecondary @click="panels.modifierManager = true;">
@@ -19,7 +19,7 @@
 
         <transition name="slide">
             <Panel v-if="panels.modifierManager">
-                <ModifierManagerPanel :edit="edit" @close="panels.modifierManager = false; edit = null; getModifiers();" />
+                <ModifierManagerPanel :edit="edit" @close="panels.modifierManager = false; edit = null; updateModifiers();" />
             </Panel>
         </transition>
 
@@ -33,6 +33,9 @@ import BtnSecondary from '../../components/Buttons/Secondary.vue';
 import ModifierBlock from '../../components/Other/ModifierBlock.vue';
 import Panel from '../../components/Panels/Panel.vue';
 import ModifierManagerPanel from '../../components/Panels/Modifiers/modifierManagerPanel.vue';
+
+import { getModifiers } from "../../logic/modifiers";
+
 
 export default {
     components: {
@@ -48,17 +51,14 @@ export default {
                 modifierManager: false
             },
             edit: null,
-            modifiers: []
+            modifiers: getModifiers()
         }
     },
     methods: {
-        getModifiers() {  // Load in modifiers from localStorage or an empty array if there are no modifiers.
-            this.modifiers = window.localStorage.getItem('app_modifiers_json') ? JSON.parse(window.localStorage.getItem('app_modifiers_json')) : [];
+        updateModifiers() {
+            this.modifiers = getModifiers();
         }
-    },
-    mounted() {
-        this.getModifiers();
-    },
+    }
 }
 </script>
 

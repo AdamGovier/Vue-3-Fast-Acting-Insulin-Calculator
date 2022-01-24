@@ -36,6 +36,7 @@ export default {
         Option,
         InputCheckBoxButton
     },
+    props: ['selected'],
     data() {
         return {
             values: {
@@ -51,7 +52,7 @@ export default {
             }
         }
     },
-    computed: {
+    computed: { // Get valid hh:mm time formats for time input.
         getTimeStart() {
             return this.returnValidTimeInput(new Date(this.values.timeStart));
         },
@@ -60,6 +61,7 @@ export default {
         }
     },
     mounted() {
+        if(this.selected) this.values = this.selected; // If previous scheduler is present then set that as the scheduler.
         this.$emit('updated', this.values);
     },
     demounted() {
