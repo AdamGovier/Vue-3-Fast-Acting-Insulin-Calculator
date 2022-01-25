@@ -60,6 +60,10 @@ app.config.globalProperties.$safety = {
     targetBloodSugar: {
         min: 3,
         max: 9.1
+    },
+
+    carbohydratesGuidance: { // show warning on the calculator if user enters more carbs than this.
+        max: 200
     }
 }
 // End of safety constraints.

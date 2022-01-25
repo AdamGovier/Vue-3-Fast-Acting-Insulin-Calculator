@@ -11,6 +11,7 @@
                     <InputButton icon="fas fa-plus"/>
                     <InputButton icon="fas fa-pizza-slice"/>
                 </InputArea>
+                <InputError v-if="errors.carbohydrates" :value="errors.carbohydrates" />
             </Option>
 
             <Option>
@@ -92,6 +93,9 @@
                     carbohydrates: 0,
                     bloodGlucose: 0              
                 },
+                errors: {
+                    carbohydrates: ""
+                },
                 modifiers: getModifiers()
             }
         },
@@ -114,6 +118,11 @@
         },
         methods: {
             runCalculations() {
+                this.errors = {}; // clear any errors.
+
+                if(this.values.carbohydrates >= this.$safety.carbohydratesGuidance.max) 
+                    this.errors.carbohydrates = "This seems like a large number of carbohydrates, are you sure this is correct?";
+
                 this.values.units = calculate({
                     carbohydrates: this.values.carbohydrates,
                     bloodGlucose: this.values.bloodGlucose,
