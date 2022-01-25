@@ -56,7 +56,7 @@
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
-                        The maximum blood sugar/blood glucose level before starting to reduce the insulin dose.
+                        The maximum blood sugar/blood glucose level before starting to increase the insulin dose.
                     </template>
                 </OptionLabel>
             </Option>

@@ -6,7 +6,7 @@
             <Option>
                 <InputArea>
                     <InputButton icon="fas fa-minus"/>
-                    <Input type="number" placeholder="0" step="0.5"/>
+                    <Input @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
                     <InputButton icon="fas fa-plus"/>
                     <InputButton icon="fas fa-pizza-slice"/>
@@ -15,7 +15,7 @@
 
             <Option>
                 <InputArea>
-                    <Input type="number" placeholder="0.00" step="0.1"/>
+                    <Input @new-data="bloodGlucose => values.bloodGlucose = parseFloat(bloodGlucose)" type="number" placeholder="0.00" step="0.1"/>
                     <InputLabel single="true" value="Blood Sugar / Glucose"/>
                     <InputButton value="mmol/L"/>
                 </InputArea>
@@ -35,10 +35,10 @@
         </div>
 
         <div style="width: 90%;" class="horizCentre">
-            <BtnPrimary value="Calculate Dosage" />
+            <BtnPrimary @click="runCalculations()" value="Calculate Dosage" />
         </div>
 
-        <h1>0.00 Units</h1>
+        <h1>{{values.units}} Units</h1>
     </section>
 
     <transition name="slide">
@@ -65,6 +65,7 @@
     import MoreOptions from '../components/Panels/Calculator/MoreOptionsPanel.vue';
 
     import { getModifiers } from "../logic/modifiers";
+    import { calculate } from "../logic/calculator";
 
     export default {
         components: {
@@ -87,7 +88,9 @@
                     moreOptions: false
                 },
                 values: {
-                    selectedModifiers: []
+                    units: "0.00", // String on purpose so I can do zeros after zeros.,
+                    carbohydrates: 0,
+                    bloodGlucose: 0              
                 },
                 modifiers: getModifiers()
             }
@@ -108,7 +111,16 @@
 
                 return selected;
             }
-        }
+        },
+        methods: {
+            runCalculations() {
+                this.values.units = calculate({
+                    carbohydrates: this.values.carbohydrates,
+                    bloodGlucose: this.values.bloodGlucose,
+                    modifiers: this.modifiers.filter(modifier => modifier.checked)
+                });
+            }
+        },
     }
 </script>
 

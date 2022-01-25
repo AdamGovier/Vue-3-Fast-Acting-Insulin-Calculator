@@ -137,7 +137,7 @@ export default {
                 
                 modifiers.push({ 
                     name: this.values.modifierName,
-                    percentage: this.values.percentage,
+                    percentage: parseFloat(this.values.percentage),
                     addition: this.values.addition,
                     scheduler: this.values.scheduler,
                     id: uuidv4() // Used to identify the modifier for purposes such as editing them and using them.

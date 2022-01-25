@@ -38,6 +38,12 @@ export default {
     this.emitter.on("lock-scroll", locked => {
         this.lockScroll = locked;
     });
+
+    this.emitter.on("emergency-reset", () => {
+      window.localStorage.clear();
+      window.localStorage.setItem("emergency-reset", true);
+      this.$router.push('/Welcome');
+    });
   },
 }
 </script>

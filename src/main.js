@@ -67,3 +67,6 @@ app.config.globalProperties.$safety = {
 app.config.globalProperties.emitter = emitter;
 
 app.use(router).mount('#app');
+
+// https://forum.vuejs.org/t/using-vue-3-global-properties-outside-a-vue-file/116954
+export default app; // Access globalProperties from external modules. e.g. ./src/logic/secureLoad.js
