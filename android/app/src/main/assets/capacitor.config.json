@@ -1,6 +1,0 @@
-{
-	"appId": "uk.co.adamgovier.boluscalc",
-	"appName": "Bolus Calculator",
-	"webDir": "dist",
-	"bundledWebRuntime": false
-}
