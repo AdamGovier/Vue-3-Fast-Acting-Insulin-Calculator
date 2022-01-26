@@ -9,8 +9,8 @@
             <Option title="Modifier Name">
                 <InputArea>
                     <Input :value="this.values.modifierName" @new-data="modifierName => values.modifierName = modifierName"  type="text" placeholder="Label e.g. Exercise" />
-                    <InputLabel single="true" value="Units"/>
                 </InputArea>
+                <InputError v-if="errors.modifierName" :value="errors.modifierName" />
             </Option>
 
             <Option title="Percentage">
@@ -18,6 +18,7 @@
                     <Input :value="this.values.percentage" @new-data="percentage => values.percentage = percentage" type="number" placeholder="e.g. 10" />
                     <InputLabel single="true" value="%"/>
                 </InputArea>
+                <InputError v-if="errors.percentage" :value="errors.percentage" />
                 <OptionLabel>
                     <template v-slot:content>
                         How much should the modifier alter your total dosage by?
@@ -100,6 +101,9 @@ export default {
                 percentage: null,
                 addition: false, // Addition=true to add percentage to dose or =false to deduct
                 scheduler: false
+            },
+            errors: {
+
             }
         }
     },
@@ -122,30 +126,31 @@ export default {
     },
     methods: {
         save() {
-            // Need to add in the else condition for this, right now it does nothing when you have missing inputs.
-            if(this.values.modifierName && this.values.percentage && this.values.percentage > 0) { // Simple validation plan to expand this.
-                const storage = window.localStorage;
-                
-                let modifiers = [];
-                if(storage.getItem('app_modifiers_json')) {
-                    modifiers = JSON.parse(storage.getItem('app_modifiers_json')); // If previous modifiers exist in the localStorage set the modifiers to them.
-                }
+            if(!this.values.modifierName) return this.errors.modifierName = "You must specify a modifier name.";
+            if(!this.values.percentage) return this.errors.percentage = "You must specify a modification amount.";
+            if(this.values.percentage <= 0) return this.errors.percentage = "Your modification amount must be greater than zero.";
 
-                if(this.edit) {
-                    modifiers = modifiers.filter(modifier => modifier.id !== this.edit); // If edit is on delete the modifier in question then below create a new one with new values.
-                }
-                
-                modifiers.push({ 
-                    name: this.values.modifierName,
-                    percentage: parseFloat(this.values.percentage),
-                    addition: this.values.addition,
-                    scheduler: this.values.scheduler,
-                    id: uuidv4() // Used to identify the modifier for purposes such as editing them and using them.
-                })
-
-                storage.setItem('app_modifiers_json', JSON.stringify(modifiers)); // Write the modifiers to the localStorage.
-                this.$emit('close'); // Close the panel.
+            const storage = window.localStorage;
+            
+            let modifiers = [];
+            if(storage.getItem('app_modifiers_json')) {
+                modifiers = JSON.parse(storage.getItem('app_modifiers_json')); // If previous modifiers exist in the localStorage set the modifiers to them.
             }
+
+            if(this.edit) {
+                modifiers = modifiers.filter(modifier => modifier.id !== this.edit); // If edit is on delete the modifier in question then below create a new one with new values.
+            }
+            
+            modifiers.push({ 
+                name: this.values.modifierName,
+                percentage: parseFloat(this.values.percentage),
+                addition: this.values.addition,
+                scheduler: this.values.scheduler,
+                id: uuidv4() // Used to identify the modifier for purposes such as editing them and using them.
+            })
+
+            storage.setItem('app_modifiers_json', JSON.stringify(modifiers)); // Write the modifiers to the localStorage.
+            this.$emit('close'); // Close the panel.
         },
         deleteMod() {
             if(this.edit) {

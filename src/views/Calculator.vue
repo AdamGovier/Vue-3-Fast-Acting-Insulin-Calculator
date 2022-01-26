@@ -44,7 +44,14 @@
 
     <transition name="slide">
         <Panel v-if="panels.moreOptions">
-            <MoreOptions @update="modifierList => modifiers = modifierList" :modifierList="modifiers" @close="panels.moreOptions = false;" />
+            <MoreOptionsPanel @update="modifierList => modifiers = modifierList" :modifierList="modifiers" @close="panels.moreOptions = false;" />
+        </Panel>
+    </transition>
+
+    <transition name="slide">
+        <Panel v-if="panels.warning"> 
+            <!-- Room for expansion for more warnings in the future. -->
+            <WarningPanelHypo @close="panels.warning = false;" />
         </Panel>
     </transition>
 </template>
@@ -63,10 +70,13 @@
     import BtnPrimary from '../components/Buttons/Primary.vue';
 
     import Panel from '../components/Panels/Panel.vue';
-    import MoreOptions from '../components/Panels/Calculator/MoreOptionsPanel.vue';
+    import MoreOptionsPanel from '../components/Panels/Calculator/MoreOptionsPanel.vue';
+    import WarningPanelHypo from '../components/Panels/Calculator/Warnings/Hypo.vue';
 
     import { getModifiers } from "../logic/modifiers";
     import { calculate } from "../logic/calculator";
+    import { load } from '../logic/secureLoad';
+    import { addEntry } from '../logic/diary';
 
     export default {
         components: {
@@ -81,12 +91,14 @@
             BtnSecondary,
             BtnPrimary,
             Panel,
-            MoreOptions
+            MoreOptionsPanel,
+            WarningPanelHypo
         },
         data() {
             return {
                 panels: {
-                    moreOptions: false
+                    moreOptions: false,
+                    warning: false
                 },
                 values: {
                     units: "0.00", // String on purpose so I can do zeros after zeros.,
@@ -123,10 +135,22 @@
                 if(this.values.carbohydrates >= this.$safety.carbohydratesGuidance.max) 
                     this.errors.carbohydrates = "This seems like a large number of carbohydrates, are you sure this is correct?";
 
+                if(this.values.bloodGlucose && this.values.bloodGlucose < load('app_minimum_blood_sugar') && !window.localStorage.getItem('app_warning_hypo_never_show'))
+                    this.panels.warning = true;
+
+                const selectedModifiers = this.modifiers.filter(modifier => modifier.checked);
+
                 this.values.units = calculate({
                     carbohydrates: this.values.carbohydrates,
                     bloodGlucose: this.values.bloodGlucose,
-                    modifiers: this.modifiers.filter(modifier => modifier.checked)
+                    modifiers: selectedModifiers
+                });
+
+                // Add entry to the diary.
+                addEntry({
+                    carbohydrates: this.values.carbohydrates,
+                    bloodGlucose: this.values.bloodGlucose,
+                    modifiers: selectedModifiers
                 });
             }
         },

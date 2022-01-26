@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Calculator from '../views/Calculator.vue';
 import Menu from '../views/Menu.vue';
 import Welcome from '../views/Welcome.vue';
+import Diary from '../views/Diary.vue';
 
 // Settings
 import SettingsMenu from '../views/SettingsMenu.vue';
@@ -19,13 +20,20 @@ const routes = [
     path: "/",
     component: Calculator
   },
+
   {
     path: "/Menu",
     component: Menu
   },
+
   {
     path: '/Welcome',
     component: Welcome
+  },
+
+  {
+    path: "/Diary",
+    component: Diary
   },
 
   // Settings menu and children.

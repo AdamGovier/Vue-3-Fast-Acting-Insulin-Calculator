@@ -14,7 +14,7 @@ export function calculate(values) {
     //round to nearest 0.25;
     dose = (Math.round(dose * 4) / 4).toFixed(2);
 
-    return dose;
+    return dose >= 0 ? dose : "0.00";
 }
 
 const handleModifiers = (modifiers, dose) => {

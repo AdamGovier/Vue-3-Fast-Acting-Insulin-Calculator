@@ -80,6 +80,10 @@ h4 {
     align-items: center;
 }
 
+.text-link {
+    color: var(--text-colour-main);
+}
+
 /* Vue Animations */
 
 .fade-enter-from, .fade-leave-to {
