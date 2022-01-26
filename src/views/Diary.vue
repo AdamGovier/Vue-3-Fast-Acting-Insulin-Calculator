@@ -7,11 +7,15 @@
             <i class="fas fa-arrow-circle-right" @click="goForwardOneDay();"></i>
         </div>
 
-        <fieldset style="margin: 2.5%; margin-top: 20px;"> 
+        <fieldset v-if="diaryEntries.length" style="margin: 2.5%; margin-top: 20px;"> 
             <legend style="padding: 0 10px;">Average 11.0 mmol/L</legend>
             <!--Arguably should not use a fieldset outside of a form but the css for a fake fieldset is ugly https://stackoverflow.com/questions/2213881/is-it-possible-to-achieve-a-fieldset-like-effect-without-using-the-fieldset-->
             <DiaryBlock v-for="entry in diaryEntries" :entry="entry" />
         </fieldset>
+
+        <p v-if="!diaryEntries.length" style="margin: 2.5%; margin-top: 20px; text-align: center;">
+            No entries found for the date: {{ renderDate }}
+        </p>
     </section>
 </template>
 

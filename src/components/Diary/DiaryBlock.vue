@@ -1,5 +1,5 @@
 <template>
-    <div class="diaryHolder goodBG">
+    <div class="diaryHolder" :class="{goodBG:bloodCategoryGood, hypoBG: bloodCategoryLow, hyperBG: bloodCategoryHigh}">
         <h5>{{ entry.bloodGlucose }}</h5>
         <span>
             <p>
@@ -19,9 +19,22 @@ export default {
     data() {
         return {
             bloodSugarUnit: window.localStorage.getItem('app_blood_sugar_unit'),
-            time: getHHMM(new Date(this.entry.timestamp))
+            time: getHHMM(new Date(this.entry.timestamp)),
+            minBlood: window.localStorage.getItem("app_minimum_blood_sugar"),
+            maxBlood: window.localStorage.getItem("app_maximum_blood_sugar")
         }
-    } 
+    },
+    computed: {
+        bloodCategoryGood() {
+            return (this.entry.bloodGlucose >= this.minBlood && this.entry.bloodGlucose <= this.maxBlood); // returns boolean
+        },
+        bloodCategoryLow() {
+            return (this.entry.bloodGlucose < this.minBlood); // returns boolean
+        },
+        bloodCategoryHigh() {
+            return (this.entry.bloodGlucose > this.maxBlood); // returns boolean
+        }
+    },
 }
 </script>
 
