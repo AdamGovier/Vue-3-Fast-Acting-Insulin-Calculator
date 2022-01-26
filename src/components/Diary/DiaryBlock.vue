@@ -1,25 +1,33 @@
 <template>
     <div class="diaryHolder goodBG">
-        <h5>11.0</h5>
+        <h5>{{ entry.bloodGlucose }}</h5>
         <span>
             <p>
-                3.75U <i class="fas fa-syringe"></i> 
+                {{ entry.units }}U <i class="fas fa-syringe"></i> 
             </p>
-            mmol/L
+            {{ bloodSugarUnit }}
         </span>
-        <h4>15:10</h4>
+        <h4>{{ time }}</h4>
     </div>
 </template>
 
 <script>
+import { getHHMM } from "../../logic/utilities";
+
 export default {
-    props: ['type']    
+    props: ['entry'],
+    data() {
+        return {
+            bloodSugarUnit: window.localStorage.getItem('app_blood_sugar_unit'),
+            time: getHHMM(new Date(this.entry.timestamp))
+        }
+    } 
 }
 </script>
 
 <style>
     .diaryHolder {
-        padding: 12.5px 11.25px;
+        padding: 5.5% 11.25px;
         margin: 2%;
         display: flex;
     }
@@ -32,6 +40,7 @@ export default {
     .diaryHolder h4 {
         font-size: 28px;
         margin-left: auto;
+        margin-block-end: 0;
     }
 
     .diaryHolder p {

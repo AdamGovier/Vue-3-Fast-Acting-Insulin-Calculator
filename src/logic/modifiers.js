@@ -1,3 +1,5 @@
+import { getHHMM } from './utilities';
+
 export function getModifiers() {
     if(!window.localStorage.getItem('app_modifiers_json')) return []; // If not in storage return empty array.
 
@@ -5,8 +7,8 @@ export function getModifiers() {
 
     modifiers = modifiers.map(modifier => { 
         if(modifier.scheduler) { // Add hh:mm values, mostly for rendering purposes.
-            modifier.scheduler.timeStart_hhmm = get_hhmm(new Date(modifier.scheduler.timeStart));
-            modifier.scheduler.timeEnd_hhmm = get_hhmm(new Date(modifier.scheduler.timeEnd));
+            modifier.scheduler.timeStart_hhmm = getHHMM(new Date(modifier.scheduler.timeStart));
+            modifier.scheduler.timeEnd_hhmm = getHHMM(new Date(modifier.scheduler.timeEnd));
         }
 
         modifier.today = isModifierToday(modifier); // Check if the modifier is scheduled for today.
@@ -49,9 +51,4 @@ function isModifierScheduledNow(modifier) {
     const currentDate = new Date();
 
     return (startDate < currentDate && endDate > currentDate);
-}
-
-function get_hhmm(dateObject) { // Returns a time string in the format hh:mm
-    const hhmm = dateObject.toISOString().split('T')[1].split(":");
-    return hhmm[0] + ":" + hhmm[1];
 }

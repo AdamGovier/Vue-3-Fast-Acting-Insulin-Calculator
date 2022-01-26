@@ -150,6 +150,7 @@
                 addEntry({
                     carbohydrates: this.values.carbohydrates,
                     bloodGlucose: this.values.bloodGlucose,
+                    units: this.values.units,
                     modifiers: selectedModifiers
                 });
             }
