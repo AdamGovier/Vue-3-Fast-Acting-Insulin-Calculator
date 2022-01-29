@@ -36,6 +36,14 @@ main {
     overflow-y:hidden;
 }
 
+.clearStatusBar {
+    padding-top: env(safe-area-inset-top);
+}
+
+.clearStatusBar .slimline {
+    border-top: none !important;
+}
+
 /* 
 .greyTop {
     border-top: solid 5px var(--tertiary-colour);

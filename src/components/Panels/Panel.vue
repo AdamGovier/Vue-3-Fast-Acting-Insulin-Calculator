@@ -1,5 +1,5 @@
 <template>
-    <section class="Panel">
+    <section class="Panel clearStatusBar">
         <slot></slot>
     </section>
 </template>
