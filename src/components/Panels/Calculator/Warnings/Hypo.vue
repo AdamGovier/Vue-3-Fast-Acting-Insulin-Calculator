@@ -69,6 +69,10 @@ import PanelHeader from "../../Components/PanelHeader.vue";
 import BtnSecondary from "../../../Buttons/Secondary.vue";
 import BtnPrimary from "../../../Buttons/Primary.vue";
 
+// https://blog.logrocket.com/building-cross-platform-apps-with-capacitor-and-vue-js/ Amazing guide this is highly recomended for using plugins.
+import { Plugins } from "@capacitor/core";
+
+
 export default {
     components: {
         MenuItem,
@@ -77,12 +81,61 @@ export default {
         BtnPrimary
     },
     methods: {
-        remindMe() {
-            // This is where I will eventually implement a background process with a push notification. For now this is just a mock.
-            setTimeout(() => {
-                alert('Mock notification - Retest Bloods.')
-            }, 600000)
+        async remindMe() {
+            const { LocalNotifications } = Plugins;
+            const permStatus = await LocalNotifications.requestPermissions();
+
+            if (permStatus.display === "granted") {
+                await LocalNotifications.schedule({
+                notifications: [
+                    {
+                        title: "Testing",
+                        body: "1 2",
+                        id: 1,
+                        schedule: { at: new Date(Date.now() + 2000) },
+                        actionTypeId: "",
+                        extra: null,
+                        sound: "alarm.wav",
+                        ongoing: true
+                    }
+                ]
+                });
+            } else {
+                alert("You will not be notified, missing permissions.");
+            }
             this.$emit('close');
+                
+            // alert("clicked")
+            // const notifs = await LocalNotifications.schedule({
+            // notifications: [
+            //     {
+            //     title: "Title",
+            //     body: "Body",
+            //     id: 1,
+            //     schedule: { at: new Date(Date.now() + 1000) },
+            //     sound: null,
+            //     attachments: null,
+            //     actionTypeId: "",
+            //     extra: null
+            //     }
+            // ]
+            // });
+            // console.log('scheduled notifications', notifs);
+
+
+            // This is where I will eventually implement a background process with a push notification. For now this is just a mock.
+            //  let permStatus = await LocalNotifications.checkPermissions();
+
+            // if (permStatus.receive === 'prompt') {
+            //     alert("yep")
+            //     permStatus = await LocalNotifications.requestPermissions();
+            // }
+
+            // if (permStatus.receive !== 'granted') {
+            //     alert("error")
+            //     throw new Error('User denied permissions!');
+            // }
+
         },
         neverShowAgain() {
             window.localStorage.setItem('app_warning_hypo_never_show', true);

@@ -16,6 +16,7 @@ export default {
         font-family: 'Montserrat', sans-serif;
         font-weight: lighter;
         font-size: 85%;
+        padding: 3% 0;
     }
 
     .single {

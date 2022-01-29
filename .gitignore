@@ -4,6 +4,7 @@ node_modules
 
 #Capacitor files.
 /android
+/ios
 
 # local env files
 .env.local
