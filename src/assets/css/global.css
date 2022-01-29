@@ -17,7 +17,7 @@
     --actionBarHeight: 17.5vh;
     --margin: 1.25vh;
     
-    --content-height: calc((100vh - var(--actionBarHeight)) - calc(var(--margin) * 2) ); /* Main height perfectly fits by taking the remaining height left from the height of the actionBar and margins */
+    --content-height: calc((100vh - var(--actionBarHeight)) - calc(var(--margin) * 2) - env(safe-area-inset-top)); /* Main height perfectly fits by taking the remaining height left from the height of the actionBar and margins */
 }
 
 * {
@@ -44,6 +44,7 @@ main {
 body {
     background-color: var(--main-bg-colour);
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
 
     color: var(--text-colour-main);
     font-family: 'Montserrat', sans-serif;
