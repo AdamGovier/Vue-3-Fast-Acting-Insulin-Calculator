@@ -12,11 +12,14 @@
     "@capacitor/core": "^3.4.0",
     "@capacitor/ios": "^3.4.0",
     "@capacitor/local-notifications": "^1.1.0",
+    "@saeris/vue-spinners": "^1.0.8",
+    "axios": "^0.25.0",
     "core-js": "^3.6.5",
     "mitt": "^3.0.0",
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "vue-spinners": "^1.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

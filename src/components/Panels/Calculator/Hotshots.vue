@@ -1,0 +1,137 @@
+<template>
+    <section class="horizCentre">
+        <div @click="this.$emit('close')" style="width: 100%;"> 
+            <!-- Can't attach click event to the MenuItem directly. -->
+            <MenuItem title="Continue" icon="fas fa-calculator" slimline="true" /> 
+        </div>
+        <div style="width: 95%; margin-top: 20px;">
+            <Option>
+                <InputArea>
+                    <Input :value="searchValue" @new-data="value => {this.searchValue = value; openFoodFactsLoading = true; apiResults=[];}" @data-changed="searchOpenFoodFacts()" type="text" placeholder="Search.."/>
+                </InputArea>
+                <OptionLabel>
+                    <template v-slot:content>
+                        Welcome to Hotshots! This area allows you to record repeative carbohydrate counts.
+                    </template>
+                </OptionLabel>
+            </Option>
+        </div>
+
+        <div style="width: 95%; margin-top: 20px;">
+            <h3 style="font-weight: normal;">Hotshots</h3>
+            <div class="hotshotGrid">
+                <Hotshot v-for="hotshot in myParsedHotshots" :hotshot="{
+                    name: hotshot.name,
+                    weight: hotshot.weight,
+                    carbs: hotshot.carbs,
+                    img: hotshot.img
+                }"/>
+            </div>
+            <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
+            <p v-if="searchValue">No results found.</p>
+            <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
+            <Loader v-if="openFoodFactsLoading && searchValue" />
+            <div class="hotshotGrid" v-if="openFoodFacts.length && searchValue">
+                <Hotshot v-for="hotshot in openFoodFacts" disableEdit="true" :hotshot="{
+                    name: hotshot.name,
+                    weight: hotshot.weight,
+                    carbs: hotshot.carbs,
+                    img: hotshot.img
+                }"/>
+            </div>
+            <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
+        </div>
+    </section>
+</template>
+
+<style scoped>
+    .hotshotGrid {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 48.5% 48.5%;
+        row-gap: 20px;
+        column-gap: 3%;
+    }
+</style>
+
+<script>
+import axios from "axios";
+
+import MenuItem from "../../menu/MenuItem.vue";
+import PannelHeader from "../Components/PanelHeader.vue";
+import Option from "../../Options/Option.vue";
+import InputArea from "../../Options/InputArea.vue";
+import Input from "../../Options/Input.vue";
+import InputLabel from "../../Options/InputLabel.vue";
+import OptionLabel from "../../Options/OptionLabel.vue";
+import ButtonSecondary from "../../Buttons/Secondary.vue";
+
+import Hotshot from "../../Other/Hotshot.vue";
+
+import Loader from '../../Other/Loader.vue';
+
+export default {
+    components: {
+        MenuItem,
+        PannelHeader,
+        Option,
+        InputArea,
+        Input,
+        InputLabel,
+        OptionLabel,
+        ButtonSecondary,
+        Hotshot,
+        Loader
+    },
+    data() {
+        return {
+            myHotshots: [
+                { 
+                    name: 'Slice of Pizza',
+                    weight: 145,
+                    carbs: 22,
+                    img: 'https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg'
+                },
+                { 
+                    name: 'Cheese Burger',
+                    weight: 113,
+                    carbs: 40,
+                    img: 'https://www.tasteofhome.com/wp-content/uploads/2020/03/Smash-Burgers_EXPS_TOHcom20_246232_B10_06_10b.jpg?fit=700,1024'
+                }
+            ],
+            apiResults: [],
+            searchValue: "",
+            openFoodFactsLoading: false
+        }
+    },
+    computed: {
+        myParsedHotshots() { // myHotshots after a search is counted in for.
+            if(!this.searchValue) return this.myHotshots;
+            return this.myHotshots.filter(hotshot => hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()));
+        },
+        openFoodFacts() {
+            if(!this.apiResults.products) return [];
+
+            const results = this.apiResults.products.map(product => {
+                return {
+                    name: product.product_name,
+                    weight: product.serving_size ? product.serving_size.split("g")[0] : undefined,
+                    img: product.image_url,
+                    carbs: product.nutriments.carbohydrates_serving
+                }
+            })
+
+            this.openFoodFactsLoading = false;
+            return results.filter(product => product.name && product.weight && product.carbs && product.img)
+        }
+    },
+    methods: {
+        searchOpenFoodFacts() {
+            axios.get(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${this.searchValue}&search_simple=1&action=process&json=1`)
+            .then(res => {
+                this.apiResults = res.data;
+            })
+        }
+    }
+}
+</script>

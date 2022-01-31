@@ -1,5 +1,5 @@
 <template>
-    <input class="inputbox" ref="inputbox" :value="value ? value : ''" @keyup="this.$emit('new-data', this.$refs.inputbox.value);" :type="type" :placeholder="placeholder" :step="step">
+    <input class="inputbox" ref="inputbox" :value="value ? value : ''" @keyup="this.$emit('new-data', this.$refs.inputbox.value);" @change="this.$emit('data-changed', this.$refs.inputbox.value)" :type="type" :placeholder="placeholder" :step="step">
 </template>
 
 <script>

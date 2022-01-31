@@ -9,7 +9,7 @@
                     <Input @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
                     <InputButton icon="fas fa-plus"/>
-                    <InputButton icon="fas fa-pizza-slice"/>
+                    <InputButton icon="fas fa-pizza-slice" @click="panels.hotshots = true;"/>
                 </InputArea>
                 <InputError v-if="errors.carbohydrates" :value="errors.carbohydrates" />
             </Option>
@@ -54,6 +54,12 @@
             <WarningPanelHypo @close="panels.warning = false;" />
         </Panel>
     </transition>
+
+    <transition name="slide">
+        <Panel v-if="panels.hotshots">
+            <HotshotsPanel @close="panels.hotshots = false;" />
+        </Panel>
+    </transition>
 </template>
 
 <script>
@@ -72,6 +78,7 @@
     import Panel from '../components/Panels/Panel.vue';
     import MoreOptionsPanel from '../components/Panels/Calculator/MoreOptionsPanel.vue';
     import WarningPanelHypo from '../components/Panels/Calculator/Warnings/Hypo.vue';
+    import HotshotsPanel from '../components/Panels/Calculator/Hotshots.vue';
 
     import { getModifiers } from "../logic/modifiers";
     import { calculate } from "../logic/calculator";
@@ -92,13 +99,15 @@
             BtnPrimary,
             Panel,
             MoreOptionsPanel,
-            WarningPanelHypo
+            WarningPanelHypo,
+            HotshotsPanel
         },
         data() {
             return {
                 panels: {
                     moreOptions: false,
-                    warning: false
+                    warning: false,
+                    hotshots: true,
                 },
                 values: {
                     units: "0.00", // String on purpose so I can do zeros after zeros.,
