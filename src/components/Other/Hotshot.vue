@@ -1,7 +1,8 @@
 <template>
     <div class="hotshot">
         <div class="head">
-            <p>{{ hotshot.carbs }}g of Carbs</p>
+            <p v-if="!hotshot.selected">{{ hotshot.carbs }}g of Carbs</p>
+            <p v-if="hotshot.selected">{{ hotshot.carbs * hotshot.selected}}g x {{ hotshot.selected }}</p>
         </div>
         <div class="thumbnail" :style="`background-image: url('${hotshot.img}');`">
             <span style="border-radius: 0 5px 0 0;">{{ hotshot.name }}</span>
@@ -10,11 +11,17 @@
         <!-- <div class="name">
             <p>Slice of Pizza</p>
         </div> -->
-        <button v-if="!disableEdit" class="hotshotBtn edit">
+        <button v-if="!disableEdit && !hotshot.selected" class="hotshotBtn edit">
             <i class="far fa-edit"></i>
             Edit
         </button>
-        <button class="hotshotBtn add">
+
+        <button v-if="hotshot.selected" @click="this.$emit('deduct')" class="hotshotBtn edit">
+            <i class="fas fa-minus"></i>
+            Subtract
+        </button>
+
+        <button class="hotshotBtn add" @click="this.$emit('add', hotshot)">
             <i class="fas fa-plus"></i>
             Add
         </button>
@@ -42,7 +49,7 @@ export default {
     
     .hotshot .thumbnail {
         width: 100%;
-        height: 130px;
+        height: 230px;
         background-image: url('https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg');
         background-size: cover;
         background-position: 50%;

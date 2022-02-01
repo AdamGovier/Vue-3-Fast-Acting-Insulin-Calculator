@@ -2,8 +2,10 @@
     <section class="horizCentre">
         <div @click="this.$emit('close')" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
-            <MenuItem title="Continue" icon="fas fa-calculator" slimline="true" /> 
+            <MenuItem v-if="!getTotalCarbs" title="Continue" icon="fas fa-calculator" slimline="true" /> 
+            <MenuItem v-if="getTotalCarbs" :title="`Continue (${getTotalCarbs}g of Carbs)`" icon="fas fa-calculator" slimline="true" /> 
         </div>
+
         <div style="width: 95%; margin-top: 20px;">
             <Option>
                 <InputArea>
@@ -20,23 +22,39 @@
         <div style="width: 95%; margin-top: 20px;">
             <h3 style="font-weight: normal;">Hotshots</h3>
             <div class="hotshotGrid">
-                <Hotshot v-for="hotshot in myParsedHotshots" :hotshot="{
-                    name: hotshot.name,
-                    weight: hotshot.weight,
-                    carbs: hotshot.carbs,
-                    img: hotshot.img
-                }"/>
+                <div v-for="hotshot in myParsedHotshots">
+                    <!-- Add 1 if already exists otherwise set to 1 -->
+                    <Hotshot 
+                    @add="hotshot => {
+                        cached.push(hotshot);
+                        selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
+                    }"
+                    @deduct="selected[hotshot.id]--;"
+                    :hotshot="{
+                        ...hotshot,
+                        selected: selected[hotshot.id]
+                    }"
+                    />
+                </div>
             </div>
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
             <p v-if="searchValue">No results found.</p>
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
             <Loader v-if="openFoodFactsLoading && searchValue" />
             <div class="hotshotGrid" v-if="openFoodFacts.length && searchValue">
-                <Hotshot v-for="hotshot in openFoodFacts" disableEdit="true" :hotshot="{
+                <Hotshot 
+                @add="hotshot => {
+                    cached.push(hotshot)
+                    selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
+                }"
+                @deduct="selected[hotshot.id]--;"
+                v-for="hotshot in openFoodFacts" disableEdit="true" :hotshot="{
                     name: hotshot.name,
                     weight: hotshot.weight,
                     carbs: hotshot.carbs,
-                    img: hotshot.img
+                    img: hotshot.img,
+                    selected: selected[hotshot.id],
+                    id: hotshot.id
                 }"/>
             </div>
             <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
@@ -90,21 +108,40 @@ export default {
                     name: 'Slice of Pizza',
                     weight: 145,
                     carbs: 22,
-                    img: 'https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg'
+                    img: 'https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg',
+                    id: "x"
                 },
                 { 
                     name: 'Cheese Burger',
                     weight: 113,
                     carbs: 40,
-                    img: 'https://www.tasteofhome.com/wp-content/uploads/2020/03/Smash-Burgers_EXPS_TOHcom20_246232_B10_06_10b.jpg?fit=700,1024'
+                    img: 'https://www.tasteofhome.com/wp-content/uploads/2020/03/Smash-Burgers_EXPS_TOHcom20_246232_B10_06_10b.jpg?fit=700,1024',
+                    id: "y"
                 }
             ],
             apiResults: [],
+            cached: [],
             searchValue: "",
-            openFoodFactsLoading: false
+            openFoodFactsLoading: false,
+            selected: {}
         }
     },
     computed: {
+        getTotalCarbs() {
+            let total = 0;
+
+            for(let hotshotID of Object.keys(this.selected)) {
+                const found = this.cached.filter(hotshot => hotshot.id === hotshotID);
+                if(found.length) {
+                    total += 
+                        found[0].carbs
+                        * this.selected[hotshotID];
+                }
+
+            }
+
+            return total;
+        },
         myParsedHotshots() { // myHotshots after a search is counted in for.
             if(!this.searchValue) return this.myHotshots;
             return this.myHotshots.filter(hotshot => hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()));
@@ -117,7 +154,8 @@ export default {
                     name: product.product_name,
                     weight: product.serving_size ? product.serving_size.split("g")[0] : undefined,
                     img: product.image_url,
-                    carbs: product.nutriments.carbohydrates_serving
+                    carbs: product.nutriments.carbohydrates_serving,
+                    id: product._id
                 }
             })
 
