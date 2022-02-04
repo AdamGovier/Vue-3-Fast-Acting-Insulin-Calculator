@@ -6,7 +6,7 @@
             <Option>
                 <InputArea>
                     <InputButton icon="fas fa-minus"/>
-                    <Input @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
+                    <Input :value="values.carbohydrates" @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
                     <InputButton icon="fas fa-plus"/>
                     <InputButton icon="fas fa-pizza-slice" @click="panels.hotshots = true;"/>
@@ -57,7 +57,7 @@
 
     <transition name="slide">
         <Panel v-if="panels.hotshots">
-            <HotshotsPanel @close="panels.hotshots = false;" />
+            <HotshotsPanel @updateCarbs="carbs => {panels.hotshots = false; values.carbohydrates += carbs}" />
         </Panel>
     </transition>
 </template>

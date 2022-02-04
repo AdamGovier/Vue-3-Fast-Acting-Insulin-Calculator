@@ -1,6 +1,6 @@
 <template>
     <section class="horizCentre">
-        <div @click="this.$emit('close')" style="width: 100%;"> 
+        <div @click="this.$emit('updateCarbs', getTotalCarbs)" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
             <MenuItem v-if="!getTotalCarbs" title="Continue" icon="fas fa-calculator" slimline="true" /> 
             <MenuItem v-if="getTotalCarbs" :title="`Continue (${getTotalCarbs}g of Carbs)`" icon="fas fa-calculator" slimline="true" /> 
@@ -22,6 +22,7 @@
         <div style="width: 95%; margin-top: 20px;">
             <h3 style="font-weight: normal;">Hotshots</h3>
             <div class="hotshotGrid">
+                <!-- Render hotshots from localstorage -->
                 <div v-for="hotshot in myParsedHotshots">
                     <!-- Add 1 if already exists otherwise set to 1 -->
                     <Hotshot 
@@ -40,7 +41,9 @@
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
             <p v-if="searchValue">No results found.</p>
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
+            <!-- Loading Spinner -->
             <Loader v-if="openFoodFactsLoading && searchValue" />
+            <!-- Load hotshots from Open Food Facts API -->
             <div class="hotshotGrid" v-if="openFoodFacts.length && searchValue">
                 <Hotshot 
                 @add="hotshot => {
@@ -49,12 +52,8 @@
                 }"
                 @deduct="selected[hotshot.id]--;"
                 v-for="hotshot in openFoodFacts" disableEdit="true" :hotshot="{
-                    name: hotshot.name,
-                    weight: hotshot.weight,
-                    carbs: hotshot.carbs,
-                    img: hotshot.img,
-                    selected: selected[hotshot.id],
-                    id: hotshot.id
+                    ...hotshot,
+                    selected: selected[hotshot.id]
                 }"/>
             </div>
             <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
@@ -103,7 +102,7 @@ export default {
     },
     data() {
         return {
-            myHotshots: [
+            myHotshots: [ // Test Data
                 { 
                     name: 'Slice of Pizza',
                     weight: 145,
@@ -132,12 +131,11 @@ export default {
 
             for(let hotshotID of Object.keys(this.selected)) {
                 const found = this.cached.filter(hotshot => hotshot.id === hotshotID);
-                if(found.length) {
+                if(found.length) { // If found the hotshot within the cached hotshots.
                     total += 
                         found[0].carbs
                         * this.selected[hotshotID];
                 }
-
             }
 
             return total;
@@ -146,20 +144,20 @@ export default {
             if(!this.searchValue) return this.myHotshots;
             return this.myHotshots.filter(hotshot => hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()));
         },
-        openFoodFacts() {
+        openFoodFacts() { // Parse the hotshot menu
             if(!this.apiResults.products) return [];
 
-            const results = this.apiResults.products.map(product => {
+            const results = this.apiResults.products.map(product => { // Get required data
                 return {
                     name: product.product_name,
-                    weight: product.serving_size ? product.serving_size.split("g")[0] : undefined,
+                    weight: product.serving_size ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
                     img: product.image_url,
                     carbs: product.nutriments.carbohydrates_serving,
                     id: product._id
                 }
             })
 
-            this.openFoodFactsLoading = false;
+            this.openFoodFactsLoading = false; // Hide the spinner
             return results.filter(product => product.name && product.weight && product.carbs && product.img)
         }
     },
