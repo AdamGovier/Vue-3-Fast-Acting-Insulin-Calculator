@@ -107,7 +107,7 @@
                 panels: {
                     moreOptions: false,
                     warning: false,
-                    hotshots: true,
+                    hotshots: false,
                 },
                 values: {
                     units: "0.00", // String on purpose so I can do zeros after zeros.,

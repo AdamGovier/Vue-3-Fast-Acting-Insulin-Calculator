@@ -58,10 +58,43 @@
             </div>
             <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
         </div>
+
+        <!-- Add hotshot footer -->
+        <div id="addHotshotFooter">
+            <ButtonSecondary @click="panels.manager = true;">
+                <i class="fas fa-camera"></i>
+                <span>Create a new hotshot</span>
+            </ButtonSecondary>
+        </div>
+
+        <transition name="slide">
+            <Panel v-if="panels.manager">
+                <HotshotManager @close="panels.manager = false;" />
+            </Panel>
+        </transition>
+
     </section>
 </template>
 
-<style scoped>
+<style>
+    #addHotshotFooter {
+        width: 100%;
+
+        position: fixed;
+        bottom: 0;
+    }
+
+    #addHotshotFooter .secondary {
+        margin: 0;
+        border-radius: 0;
+        width: 100%;
+        padding: 30px 0 ;
+    }
+
+    #addHotshotFooter .secondary div * {
+        margin: 0 10px;
+    }
+
     .hotshotGrid {
         margin-top: 10px;
         display: grid;
@@ -74,18 +107,20 @@
 <script>
 import axios from "axios";
 
-import MenuItem from "../../menu/MenuItem.vue";
-import PannelHeader from "../Components/PanelHeader.vue";
 import Option from "../../Options/Option.vue";
 import InputArea from "../../Options/InputArea.vue";
 import Input from "../../Options/Input.vue";
 import InputLabel from "../../Options/InputLabel.vue";
 import OptionLabel from "../../Options/OptionLabel.vue";
+
+import PannelHeader from "../Components/PanelHeader.vue";
+import MenuItem from "../../menu/MenuItem.vue";
 import ButtonSecondary from "../../Buttons/Secondary.vue";
-
 import Hotshot from "../../Other/Hotshot.vue";
-
 import Loader from '../../Other/Loader.vue';
+
+import Panel from "../Panel.vue";
+import HotshotManager from "./Hotshots/Manager.vue";
 
 export default {
     components: {
@@ -98,7 +133,9 @@ export default {
         OptionLabel,
         ButtonSecondary,
         Hotshot,
-        Loader
+        Loader,
+        Panel,
+        HotshotManager
     },
     data() {
         return {
@@ -122,7 +159,10 @@ export default {
             cached: [],
             searchValue: "",
             openFoodFactsLoading: false,
-            selected: {}
+            selected: {},
+            panels: {
+                manager: false,
+            }
         }
     },
     computed: {
