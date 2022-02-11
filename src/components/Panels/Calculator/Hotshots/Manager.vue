@@ -1,8 +1,8 @@
 <template>
     <section class="horizCentre">
-        <div @click="this.$emit('close')" style="width: 100%;"> 
+        <div @click="hotshot ? deleteHotshot() : this.$emit('close')" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
-            <MenuItem title="Cancel" icon="far fa-trash-alt" slimline="true" /> 
+            <MenuItem :title="hotshot ? 'Delete' : 'Cancel'" icon="far fa-trash-alt" slimline="true" /> 
         </div>
         <div id="thumb">
             <i class="far fa-images"></i>
@@ -12,15 +12,17 @@
         <div style="width: 95%; margin-top: 20px;">
             <Option title="Hotshot Name">
                 <InputArea>
-                    <Input type="text" placeholder="e.g. Pizza"/>
+                    <Input type="text" :value="values.name" @new-data="hotshotName => values.name = hotshotName" placeholder="e.g. Pizza"/>
                 </InputArea>
+                <InputError v-if="errors.hotshotName" :value="errors.hotshotName" />
             </Option>
 
             <Option title="Carbohydrates">
                 <InputArea>
-                    <Input type="number" placeholder="0"/>
+                    <Input type="number" :value="values.carbohydrates" @new-data="carbohydrates => values.carbohydrates = carbohydrates" placeholder="0"/>
                     <InputLabel value="g" single="true" />
                 </InputArea>
+                <InputError v-if="errors.carbohydrates" :value="errors.carbohydrates" />
                 <OptionLabel>
                     <template v-slot:content>
                         Number of carbohydrates per weight of portion specified below or per whole item.
@@ -31,23 +33,28 @@
             
             <Option title="Weight">
                 <InputArea>
-                    <Input type="number" placeholder="0"/>
+                    <Input :value="values.weight" @new-data="weight => values.weight = weight" type="number" placeholder="0"/>
                     <InputLabel value="g" single="true" />
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
                         Portion weight.
                     </template>
+                    <template v-slot:important>
+                        This field is optional.
+                    </template>
                 </OptionLabel>
             </Option>
         </div>
+
+        <BtnPrimary value="Save Hotshot" @click="save();" />
     </section>
 </template>
 
 <style scoped>
     #thumb {
         width: 100%;
-        height: 200px;
+        height: 17.5vh;
 
         background-size: cover;
         background-image: url('https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg');
@@ -75,6 +82,11 @@ import InputArea from "../../../Options/InputArea.vue";
 import Input from "../../../Options/Input.vue";
 import InputLabel from "../../../Options/InputLabel.vue";
 import OptionLabel from "../../../Options/OptionLabel.vue";
+import InputError from "../../../Options/InputError.vue";
+
+import BtnPrimary from "../../../Buttons/Primary.vue";
+
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
     components: {
@@ -83,7 +95,67 @@ export default {
         InputArea,
         Input,
         InputLabel,
-        OptionLabel
+        OptionLabel,
+        BtnPrimary,
+        InputError
+    },
+    props: ['hotshot'],
+    data() {
+        return {
+            values: {
+                name: null,
+                carbohydrates: null,
+                weight: null,
+                img: "https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg"
+            },
+            errors: {
+                hotshotName: null,
+                carbohydrates: null
+            }
+        }
+    },
+    mounted() {
+        if(!this.hotshot) return;
+        this.values.name = this.hotshot.name;
+        this.values.carbohydrates = this.hotshot.carbs;
+        this.values.weight = this.hotshot.weight;
+    },
+    methods: {
+        save() {
+            this.errors = {}; // clear errors.
+            if(!this.values.name) return this.errors.hotshotName = "You must specify a hotshot name.";
+            if(!this.values.carbohydrates) return this.errors.carbohydrates = "You must specify an amount of carbohydrates.";
+
+            const storage = window.localStorage;
+
+            let hotshots = [];
+            if(storage.getItem("app_local_hotshots")) hotshots = JSON.parse(storage.getItem("app_local_hotshots"));
+
+            if(this.hotshot) { // If edit, remove original hotshot from array.
+                hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id)
+            }
+
+            hotshots.push({
+                id: this.hotshot ? this.hotshot.id : uuidv4(),
+                name: this.values.name,
+                carbs: this.values.carbohydrates,
+                weight: this.values.weight,
+                img: this.values.img
+            });
+
+            storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
+            this.$emit('close');
+        },
+        deleteHotshot() {
+            const confirm = window.confirm("Are you sure you want to delete this hotshot?");
+            if(!confirm) return;
+
+            const storage = window.localStorage;
+            let hotshots = JSON.parse(storage.getItem("app_local_hotshots"));
+            hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id);
+            storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
+            this.$emit('close');
+        }
     }
 }
 </script>

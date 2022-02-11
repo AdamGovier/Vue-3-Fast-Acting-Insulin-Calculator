@@ -19,13 +19,14 @@
             </Option>
         </div>
 
-        <div style="width: 95%; margin-top: 20px;">
+        <div style="width: 95%; margin-top: 20px; margin-bottom: 100px;">
             <h3 style="font-weight: normal;">Hotshots</h3>
             <div class="hotshotGrid">
                 <!-- Render hotshots from localstorage -->
                 <div v-for="hotshot in myParsedHotshots">
                     <!-- Add 1 if already exists otherwise set to 1 -->
-                    <Hotshot 
+                    <Hotshot
+                    @edit="hotshotToEdit => {editHotshot = hotshotToEdit; panels.manager = true;}" 
                     @add="hotshot => {
                         cached.push(hotshot);
                         selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
@@ -61,7 +62,7 @@
 
         <!-- Add hotshot footer -->
         <div id="addHotshotFooter">
-            <ButtonSecondary @click="panels.manager = true;">
+            <ButtonSecondary @click="editHotshot = null; panels.manager = true;">
                 <i class="fas fa-camera"></i>
                 <span>Create a new hotshot</span>
             </ButtonSecondary>
@@ -69,7 +70,7 @@
 
         <transition name="slide">
             <Panel v-if="panels.manager">
-                <HotshotManager @close="panels.manager = false;" />
+                <HotshotManager :hotshot="editHotshot" @close="panels.manager = false; renderLocalHotshots();" />
             </Panel>
         </transition>
 
@@ -102,6 +103,7 @@
         row-gap: 20px;
         column-gap: 3%;
     }
+
 </style>
 
 <script>
@@ -162,8 +164,12 @@ export default {
             selected: {},
             panels: {
                 manager: false,
-            }
+            },
+            editHotshot: null
         }
+    },
+    mounted() {
+        this.renderLocalHotshots();
     },
     computed: {
         getTotalCarbs() {
@@ -207,6 +213,10 @@ export default {
             .then(res => {
                 this.apiResults = res.data;
             })
+        },
+        renderLocalHotshots() {
+            const storage = window.localStorage;
+            if(storage.getItem("app_local_hotshots")) this.myHotshots = JSON.parse(storage.getItem("app_local_hotshots"));
         }
     }
 }

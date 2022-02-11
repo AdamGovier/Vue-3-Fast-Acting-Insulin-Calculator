@@ -11,7 +11,7 @@
         <!-- <div class="name">
             <p>Slice of Pizza</p>
         </div> -->
-        <button v-if="!disableEdit && !hotshot.selected" class="hotshotBtn edit">
+        <button v-if="!disableEdit && !hotshot.selected" @click="this.$emit('edit', hotshot);" class="hotshotBtn edit">
             <i class="far fa-edit"></i>
             Edit
         </button>
