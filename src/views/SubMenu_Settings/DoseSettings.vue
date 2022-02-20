@@ -49,18 +49,16 @@ export default {
         InputError,
         BtnPrimary
     },
+    updated() {
+        this.emitter.emit("exit-without-saving-dialog", true);
+    },
     data() {
         return {
-            carbRatio:null,
+            carbRatio: window.localStorage.getItem("app_carb_ratio"),
             errors: {
                 carbRatio: null
             }
         }
-    },
-    mounted() {
-        const storage = window.localStorage;
-        
-        this.carbRatio = storage.getItem("app_carb_ratio");
     },
     methods: {
         saveDose() {
@@ -84,6 +82,8 @@ export default {
             } else {
                 this.$router.push('/settings');
             }
+
+            this.emitter.emit("exit-without-saving-dialog", false); // Disable dialog for next navigation page.
         }
     }
 }

@@ -136,6 +136,9 @@ export default {
             }
         }
     },
+    updated() {
+        this.emitter.emit("exit-without-saving-dialog", true);
+    },
     computed: {
         allRequiredValuesFilled() {
             // double ! To convert to boolean.
@@ -178,6 +181,7 @@ export default {
                     this.$router.push('/settings');
                 }
 
+                this.emitter.emit("exit-without-saving-dialog", false); // Disable dialog for next navigation page.
             }
         },
         bloodSugarUnitUpdated(system) { // If the checkbox is selected for the blood system.

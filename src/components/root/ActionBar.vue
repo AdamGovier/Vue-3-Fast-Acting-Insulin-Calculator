@@ -1,8 +1,9 @@
 <template>
   <nav>
-    <router-link :to="path">
+    <img @click="handleClick()" :src="iconRendered" id="navLogo">
+    <!-- <router-link :to="path"> // Moved to programatic navigation instead due to needing a exit without saving handler.
         <img :src="iconRendered" id="navLogo">
-    </router-link>
+    </router-link> -->
   </nav>
 </template>
 
@@ -27,7 +28,19 @@ export default {
     data() {
         return {
             override: null,
-            icon: "normal"
+            icon: "normal",
+            exitWithoutSaving: false
+        }
+    },
+    methods: {
+        handleClick() {
+            if(this.exitWithoutSaving) {
+                const confirm = window.confirm("You have made changes, are you sure you want to exit?");
+                if(!confirm) return;
+            }
+
+            this.exitWithoutSaving = false;
+            this.$router.push(this.path);
         }
     },
     computed: {
@@ -65,6 +78,10 @@ export default {
         this.emitter.on("override-navigation", navigation => {
             this.override = navigation.path;
             this.icon = navigation.icon;
+        });
+
+        this.emitter.on("exit-without-saving-dialog", boolean => { // Make the navigation confirm exit.
+            this.exitWithoutSaving = boolean;
         });
     }
 }

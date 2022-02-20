@@ -18,7 +18,12 @@
                 <InputArea>
                     <Input @new-data="bloodGlucose => values.bloodGlucose = parseFloat(bloodGlucose)" type="number" placeholder="0.00" step="0.1"/>
                     <InputLabel single="true" value="Blood Sugar / Glucose"/>
-                    <InputButton value="mmol/L"/>
+                    <InputButton :value="
+                        values.bloodSystem
+                    " @click="
+                        this.$router.push('/settings/CorrectionSettings');
+                        this.emitter.emit('override-navigation', {path:'/', icon:'return'});
+                    "/>
                 </InputArea>
             </Option>
         </div>
@@ -102,6 +107,9 @@
             WarningPanelHypo,
             HotshotsPanel
         },
+        mounted() {
+            this.emitter.emit('override-navigation', {path:null, icon:'normal'}); // Turn off navigation override.
+        },
         data() {
             return {
                 panels: {
@@ -112,7 +120,8 @@
                 values: {
                     units: "0.00", // String on purpose so I can do zeros after zeros.,
                     carbohydrates: 0,
-                    bloodGlucose: 0              
+                    bloodGlucose: 0,
+                    bloodSystem: window.localStorage.getItem("app_blood_sugar_unit")              
                 },
                 errors: {
                     carbohydrates: ""

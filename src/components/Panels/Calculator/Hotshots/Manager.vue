@@ -152,20 +152,24 @@ export default {
 
             const storage = window.localStorage;
             let hotshots = JSON.parse(storage.getItem("app_local_hotshots"));
-            hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id);
+            hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id); // Filter out the hotshot
             storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
             this.$emit('close');
         },
         async selectOrTakePhoto() {
-            const image = await Camera.getPhoto({ // https://capacitorjs.com/docs/apis/camera#imageoptions
-                quality: 90,
-                allowEditing: false,
-                resultType: CameraResultType.Uri
-            });
+            try {
+                const image = await Camera.getPhoto({ // https://capacitorjs.com/docs/apis/camera#imageoptions
+                    quality: 90,
+                    allowEditing: false,
+                    resultType: CameraResultType.Uri
+                });
 
-            const imageUrl = image.webPath; // get src
-            this.$refs.thumb.style.backgroundImage = `url('${imageUrl}')`; // set preview
-            this.values.img = imageUrl; // set image path in the hotshot values.
+                const imageUrl = image.webPath; // get src
+                this.$refs.thumb.style.backgroundImage = `url('${imageUrl}')`; // set preview
+                this.values.img = imageUrl; // set image path in the hotshot values.
+            } catch (e) {
+                // User most likely has exited camera app.
+            }
         }
     }
 }
