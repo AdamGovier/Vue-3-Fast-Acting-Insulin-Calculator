@@ -3,6 +3,8 @@ import App from './App.vue';
 import router from './router';
 
 import mitt from 'mitt'; // https://stackoverflow.com/questions/63471824/vue-js-3-event-bus
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
 const emitter = mitt();
 
 const app = createApp(App);
@@ -71,6 +73,7 @@ app.config.globalProperties.$safety = {
 app.config.globalProperties.emitter = emitter;
 
 app.use(router).mount('#app');
+defineCustomElements(app.config.globalProperties.window);
 
 // https://forum.vuejs.org/t/using-vue-3-global-properties-outside-a-vue-file/116954
 export default app; // Access globalProperties from external modules. e.g. ./src/logic/secureLoad.js

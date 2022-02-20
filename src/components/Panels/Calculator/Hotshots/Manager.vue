@@ -4,7 +4,7 @@
             <!-- Can't attach click event to the MenuItem directly. -->
             <MenuItem :title="hotshot ? 'Delete' : 'Cancel'" icon="far fa-trash-alt" slimline="true" /> 
         </div>
-        <div id="thumb">
+        <div ref="thumb" id="thumb" @click="selectOrTakePhoto();">
             <i class="far fa-images"></i>
         </div>
         
@@ -57,7 +57,6 @@
         height: 17.5vh;
 
         background-size: cover;
-        background-image: url('https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg');
     }
 
     #thumb i {
@@ -87,6 +86,7 @@ import InputError from "../../../Options/InputError.vue";
 import BtnPrimary from "../../../Buttons/Primary.vue";
 
 import { v4 as uuidv4 } from 'uuid';
+import { Camera, CameraResultType } from '@capacitor/camera';
 
 export default {
     components: {
@@ -106,7 +106,7 @@ export default {
                 name: null,
                 carbohydrates: null,
                 weight: null,
-                img: "https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg"
+                img: null
             },
             errors: {
                 hotshotName: null,
@@ -155,6 +155,17 @@ export default {
             hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id);
             storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
             this.$emit('close');
+        },
+        async selectOrTakePhoto() {
+            const image = await Camera.getPhoto({ // https://capacitorjs.com/docs/apis/camera#imageoptions
+                quality: 90,
+                allowEditing: false,
+                resultType: CameraResultType.Uri
+            });
+
+            const imageUrl = image.webPath; // get src
+            this.$refs.thumb.style.backgroundImage = `url('${imageUrl}')`; // set preview
+            this.values.img = imageUrl; // set image path in the hotshot values.
         }
     }
 }
