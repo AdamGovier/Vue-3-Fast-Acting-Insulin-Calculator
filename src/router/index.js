@@ -14,6 +14,8 @@ import Modifiers from '../views/SubMenu_Settings/Modifiers.vue';
 // Support
 import SupportMenu from '../views/SupportMenu.vue';
 import Legal from '../views/SubMenu_Support/Legal.vue';
+import Contact from "../views/SubMenu_Support/Contact.vue";
+import Tutorials from "../views/SubMenu_Support/Tutorials.vue";
 
 const routes = [
   {
@@ -66,6 +68,14 @@ const routes = [
   {
     path: "/support/Legal",
     component: Legal
+  },
+  {
+    path: "/support/Contact",
+    component: Contact
+  },
+  {
+    path: "/support/Tutorials",
+    component: Tutorials
   }
 
   // End of support menu and children.

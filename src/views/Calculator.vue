@@ -5,10 +5,10 @@
         <div style="width: 90%;">
             <Option>
                 <InputArea>
-                    <InputButton icon="fas fa-minus"/>
+                    <InputButton icon="fas fa-minus" @mousedown="changeCarbohydratesByStep(false)" @mouseup="incrementCancel = true;" />
                     <Input :value="values.carbohydrates" @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
-                    <InputButton icon="fas fa-plus"/>
+                    <InputButton icon="fas fa-plus" @mousedown="changeCarbohydratesByStep(true)" @mouseup="incrementCancel = true;"/>
                     <InputButton icon="fas fa-pizza-slice" @click="panels.hotshots = true;"/>
                 </InputArea>
                 <InputError v-if="errors.carbohydrates" :value="errors.carbohydrates" />
@@ -62,7 +62,7 @@
 
     <transition name="slide">
         <Panel v-if="panels.hotshots">
-            <HotshotsPanel @updateCarbs="carbs => {panels.hotshots = false; values.carbohydrates += carbs}" />
+            <HotshotsPanel @updateCarbs="carbs => {panels.hotshots = false; values.carbohydrates ? values.carbohydrates += carbs : values.carbohydrates = carbs}" />
         </Panel>
     </transition>
 </template>
@@ -126,6 +126,7 @@
                 errors: {
                     carbohydrates: ""
                 },
+                incrementCancel: false,
                 modifiers: getModifiers()
             }
         },
@@ -171,6 +172,39 @@
                     units: this.values.units,
                     modifiers: selectedModifiers
                 });
+            },
+            /**
+             * Method to increase/decrease the amount of carbohydrates based on how long the + or - button is held down for.
+             */
+            changeCarbohydratesByStep(addition) { // True = + amt of carbs or False = - amt of carbs
+                let increment = addition ? 5 : -5;
+                let ticks = 0; // The amt of ticks passed in the interval.
+
+                const interval = setInterval(() => {
+                    ticks++; // Next tick.
+
+                    // Longer pressed the bigger the increment or decrement.
+                    switch (ticks) { 
+                        case 5: // If 5th tick and so on.
+                            increment = addition ? 10 : -10;
+                            break;
+                        case 10:
+                            increment = addition ? 20 : -20;
+                            break;
+                        case 15:
+                            increment = addition ? 40 : -40;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    this.values.carbohydrates += increment; // set new value.
+
+                    if(this.incrementCancel) {
+                        clearInterval(interval); // stop increase.
+                        this.incrementCancel = false; // Allow the buttons to be held again.
+                    }
+                }, 200);
             }
         },
     }

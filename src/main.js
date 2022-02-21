@@ -13,7 +13,7 @@ const app = createApp(App);
 app.config.globalProperties.$author = "Adam Govier";
 app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
-app.config.globalProperties.$tos_version = "1.6";
+app.config.globalProperties.$tos_version = "1.7";
 
 // Safety constraints.
 

@@ -1,7 +1,7 @@
 <template>
     <section>
-        <MenuItem title="Tutorials" icon="fab fa-youtube" location=""/>
-        <MenuItem title="Contact" icon="far fa-envelope" location=""/>
+        <MenuItem title="Tutorials" icon="fab fa-youtube" location="/support/Tutorials"/>
+        <MenuItem title="Contact" icon="far fa-envelope" location="/support/Contact"/>
         <MenuItem title="Legal" icon="fas fa-balance-scale-right" location="/support/Legal"/>
         <DevStamp />
     </section>
