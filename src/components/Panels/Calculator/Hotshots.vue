@@ -10,6 +10,7 @@
             <Option>
                 <InputArea>
                     <Input :value="searchValue" @new-data="value => {this.searchValue = value; openFoodFactsLoading = true; apiResults=[];}" @data-changed="searchOpenFoodFacts()" type="text" placeholder="Search.."/>
+                    <InputButton icon="fas fa-camera" @click="scanBarcode();" />
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
@@ -39,9 +40,14 @@
                     />
                 </div>
             </div>
+
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
-            <p v-if="searchValue">No results found.</p>
+                <p v-if="searchValue">No results found.</p>
+
             <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
+            {{}}
+            <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
+
             <!-- Loading Spinner -->
             <Loader v-if="openFoodFactsLoading && searchValue" />
             <!-- Load hotshots from Open Food Facts API -->
@@ -57,7 +63,6 @@
                     selected: selected[hotshot.id]
                 }"/>
             </div>
-            <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
         </div>
 
         <!-- Add hotshot footer -->
@@ -74,6 +79,7 @@
             </Panel>
         </transition>
 
+        <BarcodeScannerUI v-if="showBarcodeUI" />
     </section>
 </template>
 
@@ -113,6 +119,7 @@ import Option from "../../Options/Option.vue";
 import InputArea from "../../Options/InputArea.vue";
 import Input from "../../Options/Input.vue";
 import InputLabel from "../../Options/InputLabel.vue";
+import InputButton from "../../Options/InputButton.vue";
 import OptionLabel from "../../Options/OptionLabel.vue";
 
 import PannelHeader from "../Components/PanelHeader.vue";
@@ -121,8 +128,13 @@ import ButtonSecondary from "../../Buttons/Secondary.vue";
 import Hotshot from "../../Other/Hotshot.vue";
 import Loader from '../../Other/Loader.vue';
 
+import BarcodeScannerUI from '../../Other/BarcodeScannerUI.vue';
+
+
 import Panel from "../Panel.vue";
 import HotshotManager from "./Hotshots/Manager.vue";
+
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 export default {
     components: {
@@ -132,12 +144,14 @@ export default {
         InputArea,
         Input,
         InputLabel,
+        InputButton,
         OptionLabel,
         ButtonSecondary,
         Hotshot,
         Loader,
         Panel,
-        HotshotManager
+        HotshotManager,
+        BarcodeScannerUI
     },
     data() {
         return {
@@ -161,6 +175,7 @@ export default {
             cached: [],
             searchValue: "",
             openFoodFactsLoading: false,
+            showBarcodeUI: false,
             selected: {},
             panels: {
                 manager: false,
@@ -191,7 +206,10 @@ export default {
             return this.myHotshots.filter(hotshot => hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()));
         },
         openFoodFacts() { // Parse the hotshot menu
-            if(!this.apiResults.products) return [];
+            if(!this.apiResults.products) { // if no products
+                // this.openFoodFactsLoading = false; // Hide the spinner
+                return []; // return empty array
+            } 
 
             const results = this.apiResults.products.map(product => { // Get required data
                 return {
@@ -208,15 +226,50 @@ export default {
         }
     },
     methods: {
-        searchOpenFoodFacts() {
-            axios.get(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${this.searchValue}&search_simple=1&action=process&json=1`)
+        searchOpenFoodFacts(barcode) {
+            const url = barcode ? `https://world.openfoodfacts.org/api/v2/product/${barcode}` : `https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${this.searchValue}&search_simple=1&action=process&json=1`;
+
+            axios.get(url)
             .then(res => {
-                this.apiResults = res.data;
+                this.apiResults = barcode ? {products:[res.data.product]} : res.data;
+            }).catch(e => {
+                switch (e.response.status) {
+                    case 404:
+                        this.apiResults = {products:[]};
+                        break;
+                
+                    default:
+                        break;
+                }
             })
         },
         renderLocalHotshots() {
             const storage = window.localStorage;
             if(storage.getItem("app_local_hotshots")) this.myHotshots = JSON.parse(storage.getItem("app_local_hotshots"));
+        },
+        async scanBarcode() {
+            this.emitter.emit("hide-ui", true);
+            this.showBarcodeUI = true;
+
+            const status = await BarcodeScanner.checkPermission({ force: true });
+            BarcodeScanner.hideBackground(); // make background of WebView transparent
+        
+            const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
+            
+            // if the result has content
+            if (result.hasContent) {
+                this.emitter.emit("hide-ui", false);
+
+                this.searchValue = result.content;
+                this.openFoodFactsLoading = true; 
+                this.apiResults=[];
+
+                this.searchOpenFoodFacts(result.content);
+                this.showBarcodeUI = false;
+
+                
+                // window.alert(result.content); // log the raw scanned content
+            }
         }
     }
 }

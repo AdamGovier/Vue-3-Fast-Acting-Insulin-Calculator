@@ -1,6 +1,8 @@
 <template>
-  <ActionBar />
-  <main :class="{lockScroll}">
+  <div v-if="ui">
+    <ActionBar  />
+  </div>
+  <main :class="{hideUi:!ui, lockScroll}">
       <router-view/>
   </main>
 </template>
@@ -19,7 +21,8 @@ export default {
   },
   data() {
     return {
-      lockScroll: false
+      lockScroll: false,
+      ui: true, // https://github.com/capacitor-community/barcode-scanner/issues/26
     }
   },
   mounted() {
@@ -34,6 +37,11 @@ export default {
         this.$router.push('/support/Legal');
       }
     }
+
+    this.emitter.on("hide-ui", bool => {  // https://github.com/capacitor-community/barcode-scanner/issues/26
+        this.ui = !bool; // ui = !hide-ui value
+        bool ? document.body.classList.add("backgroundTransparent") : document.body.classList.remove("backgroundTransparent");
+    });
 
     this.emitter.on("lock-scroll", locked => {
         this.lockScroll = locked;

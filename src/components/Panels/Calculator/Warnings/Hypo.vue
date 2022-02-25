@@ -104,37 +104,6 @@ export default {
                 alert("You will not be notified, missing permissions.");
             }
             this.$emit('close');
-                
-            // alert("clicked")
-            // const notifs = await LocalNotifications.schedule({
-            // notifications: [
-            //     {
-            //     title: "Title",
-            //     body: "Body",
-            //     id: 1,
-            //     schedule: { at: new Date(Date.now() + 1000) },
-            //     sound: null,
-            //     attachments: null,
-            //     actionTypeId: "",
-            //     extra: null
-            //     }
-            // ]
-            // });
-            // console.log('scheduled notifications', notifs);
-
-
-            // This is where I will eventually implement a background process with a push notification. For now this is just a mock.
-            //  let permStatus = await LocalNotifications.checkPermissions();
-
-            // if (permStatus.receive === 'prompt') {
-            //     alert("yep")
-            //     permStatus = await LocalNotifications.requestPermissions();
-            // }
-
-            // if (permStatus.receive !== 'granted') {
-            //     alert("error")
-            //     throw new Error('User denied permissions!');
-            // }
 
         },
         neverShowAgain() {

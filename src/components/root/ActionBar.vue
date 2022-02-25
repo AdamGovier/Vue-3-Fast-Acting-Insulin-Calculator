@@ -1,4 +1,6 @@
 <template>
+  <!-- Testing -->
+  <p style="display: none;">{{path}}</p> 
   <nav>
     <img @click="handleClick()" :src="iconRendered" id="navLogo">
     <!-- <router-link :to="path"> // Moved to programatic navigation instead due to needing a exit without saving handler.
