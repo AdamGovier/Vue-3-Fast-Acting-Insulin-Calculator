@@ -5,6 +5,7 @@
             <br/>
             <p>Please accept the new Terms & Conditions below.</p>
         </div>
+
         <h1>Things to Note</h1>
         <LegalBlock>
             <p>
@@ -140,7 +141,7 @@ export default {
     text-align: center; 
 
     width: 90%; 
-    margin-top: 20px; 
+    margin: 20px 0; 
     padding: 5% 2%;
 }
 

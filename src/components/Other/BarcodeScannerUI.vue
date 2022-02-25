@@ -1,20 +1,43 @@
 <template>
     <Teleport to="body">
-        <h5 style="color: red;">Test</h5>
-        <div style="height: 100vh; width: 100%; position: fixed; top: 0; left: 0; display: flex; align-items: center; justify-content: center;">
+        <div @click="this.$emit('close')" style="width: 100%;"> 
+            <!-- Can't attach click event to the MenuItem directly. -->
+            <MenuItem title="Cancel" icon="far fa-trash-alt" slimline="true" /> 
+        </div>
+        <div class="fullPage" style="display: flex; align-items: center; justify-content: center;">
             <div id="scanner">
 
             </div>
         </div>
-
+        <div class="fullPage" style="display: flex; align-items: flex-end; justify-content: center;">
+            <div class="infoHolder">
+                <h2 style="margin-block-end: 0; padding: 4vh 0;">Point your camera at a barcode.</h2>
+            </div>
+        </div>
     </Teleport>
 </template>
 
 <style scoped>
     #scanner {
         width: 80vw;
-        height: 20vh;
+        height: 15vh;
 
-        border: 3px solid grey;
+        border: 3px solid var(--action-colour);
+    }
+
+    .infoHolder {
+        background-color: var(--secondary-bg-colour);
+        width: 100%; text-align: 
+        center;
     }
 </style>
+
+<script>
+import MenuItem from "../menu/MenuItem.vue";
+
+export default {
+    components: {
+        MenuItem
+    }
+}
+</script>

@@ -105,6 +105,14 @@ a {
     color: var(--text-colour-main);
 }
 
+.fullPage {
+    height: 100vh; 
+    width: 100%; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+}
+
 /* Vue Animations */
 
 .fade-enter-from, .fade-leave-to {
