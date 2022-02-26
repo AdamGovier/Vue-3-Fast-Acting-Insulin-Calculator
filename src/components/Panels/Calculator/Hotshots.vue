@@ -259,7 +259,7 @@ export default {
             this.emitter.emit("hide-ui", true);
         
             const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
-
+            return;
             // if the result has content
             if (result.hasContent) {
                 BarcodeScanner.stopScan();
