@@ -251,15 +251,15 @@ export default {
         async scanBarcode() {
             this.showBarcodeUI = true;
 
-            // const status = await BarcodeScanner.checkPermission({ force: true });
+            const status = await BarcodeScanner.checkPermission({ force: true });
 
-            // if(!status.granted) return window.alert("Please allow Bolus Calculator to use your camera in your system settings.");
+            if(!status.granted) return window.alert("Please allow Bolus Calculator to use your camera in your system settings.");
             
             // make background of WebView transparent
             this.emitter.emit("hide-ui", true);
         
-            // const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
-            return;
+            const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
+
             // if the result has content
             if (result.hasContent) {
                 BarcodeScanner.stopScan();
