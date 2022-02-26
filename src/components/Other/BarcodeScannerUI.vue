@@ -1,6 +1,6 @@
 <template>
     <Teleport to="body">
-        <div @click="this.$emit('close')" style="width: 100%;"> 
+        <div @click="this.$emit('close')" style="width: 100%; position: fixed; top: 0; padding-top: env(safe-area-inset-top); background-color: var(--secondary-bg-colour);"> 
             <!-- Can't attach click event to the MenuItem directly. -->
             <MenuItem title="Cancel" icon="far fa-trash-alt" slimline="true" /> 
         </div>
