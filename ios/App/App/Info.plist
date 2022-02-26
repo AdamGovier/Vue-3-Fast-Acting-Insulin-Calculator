@@ -51,6 +51,10 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
     <key>NSCameraUsageDescription</key>
-    <string>To be able to scan barcodes</string>
+    <string>To be able to scan barcodes & take photos of Hotshots.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Select photos from library.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Select photos from library.</string>
 </dict>
 </plist>
