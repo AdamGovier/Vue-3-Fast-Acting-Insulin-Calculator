@@ -1,11 +1,11 @@
 <template>
-    <div class="diaryHolder" :class="{goodBG:bloodCategoryGood, hypoBG: bloodCategoryLow, hyperBG: bloodCategoryHigh}">
-        <h5>{{ entry.bloodGlucose }}</h5>
+    <div class="diaryHolder" :class="{goodBG:bloodCategoryGood, hypoBG: bloodCategoryLow, hyperBG: bloodCategoryHigh, noBG: !entry.bloodGlucose}">
+        <h5>{{ entry.bloodGlucose ? entry.bloodGlucose : "N/A" }}</h5>
         <span>
             <p>
                 {{ entry.units }}U <i class="fas fa-syringe"></i> 
             </p>
-            {{ bloodSugarUnit }}
+            {{ entry.bloodGlucose ? bloodSugarUnit : ''}}
         </span>
         <h4>{{ time }}</h4>
     </div>
@@ -74,5 +74,9 @@ export default {
 
     .diaryHolder.hyperBG {
         background-color: darkorange;
+    }
+
+    .diaryHolder.noBG {
+        background-color: var(--tertiary-colour);
     }
 </style>
