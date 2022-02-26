@@ -2,10 +2,6 @@
 node_modules
 /dist
 
-#Capacitor files.
-/android
-/ios
-
 # local env files
 .env.local
 .env.*.local
