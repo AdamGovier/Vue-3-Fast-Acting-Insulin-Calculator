@@ -1,14 +1,13 @@
 <template>
     <section id="calculator" class="horizCentre">
         <h1>Bolus Calculator</h1>
-
         <div style="width: 90%;">
             <Option>
                 <InputArea>
-                    <InputButton icon="fas fa-minus" @mousedown="changeCarbohydratesByStep(false)" @mouseup="incrementCancel = true;" />
+                    <InputButton icon="fas fa-minus" @touchstart.prevent="changeCarbohydratesByStep(false)" @touchend="incrementCancel = true" />
                     <Input :value="values.carbohydrates" @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
-                    <InputButton icon="fas fa-plus" @mousedown="changeCarbohydratesByStep(true)" @mouseup="incrementCancel = true;"/>
+                    <InputButton icon="fas fa-plus" @touchstart.prevent="changeCarbohydratesByStep(true)" @touchend="incrementCancel = true" />
                     <InputButton icon="fas fa-pizza-slice" @click="panels.hotshots = true;"/>
                 </InputArea>
                 <InputError v-if="errors.carbohydrates" :value="errors.carbohydrates" />

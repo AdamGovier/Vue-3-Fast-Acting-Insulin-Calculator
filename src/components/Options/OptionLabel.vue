@@ -1,9 +1,9 @@
 <template>
     <div class="optionLabel">
-        <p>
+        <p class="noselect">
             <slot name="content"></slot>
         </p>
-        <p class="important" v-if="hasImportant">
+        <p class="important noselect" v-if="hasImportant">
             <slot name="important"></slot>
         </p>
     </div>

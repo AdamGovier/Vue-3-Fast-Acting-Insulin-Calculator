@@ -1,5 +1,5 @@
 <template>
-    <label class="inputLabel" :class="{single}">{{ value }}</label>
+    <label class="inputLabel noselect" :class="{single}">{{ value }}</label>
 </template>
 
 <script>

@@ -2,7 +2,7 @@
     <div class="hotshot">
         <div class="head">
             <p v-if="!hotshot.selected">{{ hotshot.carbs }}g of Carbs</p>
-            <p v-if="hotshot.selected">{{ hotshot.carbs * hotshot.selected}}g x {{ hotshot.selected }}</p>
+            <p v-if="hotshot.selected">{{ roundPointFive(hotshot.carbs * hotshot.selected)}}g {{ hotshot.selected }}x</p>
         </div>
         <div class="thumbnail" :style="`background-image: url('${hotshot.img}');`">
             <span style="border-radius: 0 5px 0 0;">{{ hotshot.name }}</span>
@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { roundPointFive } from "../../logic/utilities";
+
 export default {
     props:['hotshot', 'disableEdit']
 }

@@ -1,9 +1,9 @@
 <template>
     <section class="horizCentre">
-        <div @click="this.$emit('updateCarbs', getTotalCarbs)" style="width: 100%;"> 
+        <div @click="this.$emit('updateCarbs', totalCarbs)" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
-            <MenuItem v-if="!getTotalCarbs" title="Continue" icon="fas fa-calculator" slimline="true" /> 
-            <MenuItem v-if="getTotalCarbs" :title="`Continue (${getTotalCarbs}g of Carbs)`" icon="fas fa-calculator" slimline="true" /> 
+            <MenuItem v-if="!totalCarbs" title="Continue" icon="fas fa-calculator" slimline="true" /> 
+            <MenuItem v-if="totalCarbs" :title="`Continue (${totalCarbs}g of Carbs)`" icon="fas fa-calculator" slimline="true" /> 
         </div>
 
         <div style="width: 95%; margin-top: 20px;">
@@ -75,7 +75,7 @@
 
         <transition name="slide">
             <Panel v-if="panels.manager">
-                <HotshotManager :hotshot="editHotshot" @close="panels.manager = false; renderLocalHotshots();" />
+                <HotshotManager :barcode="loadedBarcode" :hotshot="editHotshot" @close="panels.manager = false; renderLocalHotshots();" />
             </Panel>
         </transition>
 
@@ -130,11 +130,11 @@ import Loader from '../../Other/Loader.vue';
 
 import BarcodeScannerUI from '../../Other/BarcodeScannerUI.vue';
 
-
 import Panel from "../Panel.vue";
 import HotshotManager from "./Hotshots/Manager.vue";
 
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { roundPointFive } from '../../../logic/utilities';
 
 export default {
     components: {
@@ -177,17 +177,19 @@ export default {
             openFoodFactsLoading: false,
             showBarcodeUI: false,
             selected: {},
+            loadedBarcode: null,
             panels: {
                 manager: false,
             },
-            editHotshot: null
+            editHotshot: null,
+            foundItemFromBarcode: false
         }
     },
     mounted() {
         this.renderLocalHotshots();
     },
     computed: {
-        getTotalCarbs() {
+        totalCarbs() {
             let total = 0;
 
             for(let hotshotID of Object.keys(this.selected)) {
@@ -199,11 +201,20 @@ export default {
                 }
             }
 
-            return total;
+            return roundPointFive(total);
         },
         myParsedHotshots() { // myHotshots after a search is counted in for.
             if(!this.searchValue) return this.myHotshots;
-            return this.myHotshots.filter(hotshot => hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()));
+            return this.myHotshots.filter(
+                hotshot => {
+                    if(hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()))
+                        return true;
+                    if(hotshot.barcode === this.searchValue) {
+                        this.foundItemFromBarcode = true;
+                        return true;
+                    }
+                }
+            );
         },
         openFoodFacts() { // Parse the hotshot menu
             if(!this.apiResults.products) { // if no products
@@ -232,9 +243,18 @@ export default {
             axios.get(url)
             .then(res => {
                 this.apiResults = barcode ? {products:[res.data.product]} : res.data;
+                if(barcode) this.foundItemFromBarcode = true;
             }).catch(e => {
                 switch (e.response.status) {
                     case 404:
+                        if(!this.foundItemFromBarcode) {
+                            const confirm = window.confirm("There are no products on record for this barcode, would you like to create a hotshot for it?")
+                            if(confirm) { // show hotshot creator
+                                this.editHotshot = null; 
+                                this.panels.manager = true; 
+                            } 
+                        }
+
                         this.apiResults = {products:[]};
                         break;
                 
@@ -259,6 +279,8 @@ export default {
         
             const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
 
+            // const result = {hasContent: true, content:"231321"}
+
             // if the result has content
             if (result.hasContent) {
                 BarcodeScanner.stopScan();
@@ -270,6 +292,7 @@ export default {
                 this.openFoodFactsLoading = true; 
                 this.apiResults=[];
 
+                this.loadedBarcode = result.content;
                 this.searchOpenFoodFacts(result.content);
 
                 

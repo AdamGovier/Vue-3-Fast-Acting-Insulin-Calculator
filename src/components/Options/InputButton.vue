@@ -1,5 +1,5 @@
 <template>
-    <button class="inputButton" type="button">
+    <button class="inputButton noselect" type="button">
         <span v-if="value">
             {{ value }}
         </span>
@@ -16,11 +16,11 @@ export default {
 <style>
 .inputButton {
     padding: 0 10px;
-    height: 40px;
+    height: 50px;
 
     background-color: rgba(0, 0, 0, 0);
     color: var(--action-colour);
-    font-size: 1em;
+    font-size: 1.15em;
 
     border: none;
     border-radius: 4px;

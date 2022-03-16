@@ -1,5 +1,5 @@
 <template>
-    <div class="InputCheckBoxButton">
+    <div class="InputCheckBoxButton noselect">
         <label @mouseup="this.$emit('handleClick', checkbox.name)">
             <input type="checkbox" @click.prevent="" :checked="checkbox.checked">
             <span>{{ checkbox.name }}</span>

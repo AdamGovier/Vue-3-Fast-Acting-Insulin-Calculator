@@ -12,3 +12,7 @@ export function getHHMM(dateObject) { // Returns a time string in the format hh:
     const hhmm = dateObject.toISOString().split('T')[1].split(":");
     return hhmm[0] + ":" + hhmm[1];
 }
+
+export function roundPointFive(num) {
+    return Math.round(num*2)/2;
+}

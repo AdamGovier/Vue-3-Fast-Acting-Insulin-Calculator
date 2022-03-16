@@ -1,7 +1,7 @@
 <template>
     <div class="optionBox" :class="{horizCentre:centre}">
-        <div v-if="title" class="optionTitle">
-            <h4>{{ title }}</h4>
+        <div v-if="title" class="optionTitle noselect">
+            <h4 class="noselect">{{ title }}</h4>
         </div>
         <div>
             <slot></slot>

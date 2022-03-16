@@ -30,7 +30,6 @@
                 </OptionLabel>
             </Option>
 
-            
             <Option title="Weight">
                 <InputArea>
                     <Input :value="values.weight" @new-data="weight => values.weight = weight" type="number" placeholder="0"/>
@@ -39,6 +38,20 @@
                 <OptionLabel>
                     <template v-slot:content>
                         Portion weight.
+                    </template>
+                    <template v-slot:important>
+                        This field is optional.
+                    </template>
+                </OptionLabel>
+            </Option>
+
+            <Option title="Barcode" v-if="barcode">
+                <InputArea>
+                    <Input :value="barcode" @new-data="barcodeNum => barcode = barcodeNum" type="number" placeholder="0"/>
+                </InputArea>
+                <OptionLabel>
+                    <template v-slot:content>
+                        Allow this item to be selected by scanning this barcode number.
                     </template>
                     <template v-slot:important>
                         This field is optional.
@@ -99,7 +112,7 @@ export default {
         BtnPrimary,
         InputError
     },
-    props: ['hotshot'],
+    props: ['hotshot', 'barcode'],
     data() {
         return {
             values: {
@@ -140,7 +153,8 @@ export default {
                 name: this.values.name,
                 carbs: this.values.carbohydrates,
                 weight: this.values.weight,
-                img: this.values.img
+                img: this.values.img,
+                barcode: this.barcode
             });
 
             storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
