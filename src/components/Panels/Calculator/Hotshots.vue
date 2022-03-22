@@ -9,7 +9,7 @@
         <div style="width: 95%; margin-top: 20px;">
             <Option>
                 <InputArea>
-                    <Input :value="searchValue" @new-data="value => {this.searchValue = value; openFoodFactsLoading = true; apiResults=[];}" @data-changed="searchOpenFoodFacts()" type="text" placeholder="Search.."/>
+                    <Input type="text" placeholder="Search.." :value="search.value" @new-data="value => {search.value = value;}" @data-changed="search.searchType = 'keyword'; populateHotshots();" />
                     <InputButton icon="fas fa-camera" @click="scanBarcode();" />
                 </InputArea>
                 <OptionLabel>
@@ -22,65 +22,78 @@
 
         <div style="width: 95%; margin-top: 20px; margin-bottom: 100px;">
             <h3 style="font-weight: normal;">Hotshots</h3>
+                <p v-if="!results.local.length">No results found.</p>
+
             <div class="hotshotGrid">
                 <!-- Render hotshots from localstorage -->
-                <div v-for="hotshot in myParsedHotshots">
+                <div v-for="hotshot in results.local">
                     <!-- Add 1 if already exists otherwise set to 1 -->
                     <Hotshot
-                    @edit="hotshotToEdit => {editHotshot = hotshotToEdit; panels.manager = true;}" 
-                    @add="hotshot => {
-                        cached.push(hotshot);
-                        selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
-                    }"
-                    @deduct="selected[hotshot.id]--;"
-                    :hotshot="{
-                        ...hotshot,
-                        selected: selected[hotshot.id]
-                    }"
+                        @edit="hotshotToEdit => {editHotshot = hotshotToEdit; panels.manager = true;}"
+                        @add="hotshot => {
+                            cached.push(hotshot);
+                            selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
+                        }"
+                        @deduct="selected[hotshot.id]--;"
+                        :hotshot="{
+                            ...hotshot,
+                            selected: selected[hotshot.id]
+                        }"
                     />
                 </div>
             </div>
 
-            <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
-                <p v-if="searchValue">No results found.</p>
+            <h3 v-if="search.value" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
+                <p v-if="search.value">No results found.</p>
 
-            <h3 v-if="searchValue" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
-            {{}}
-            <p v-if="searchValue && !openFoodFacts.length && !openFoodFactsLoading">No results found.</p>
+            <h3 v-if="search.value" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
+                <p v-if="search.value && !results.open_food_facts.length">No results found.</p>
 
             <!-- Loading Spinner -->
-            <Loader v-if="openFoodFactsLoading && searchValue" />
+            <Loader v-if="loaders.open_food_facts"/>
             <!-- Load hotshots from Open Food Facts API -->
-            <div class="hotshotGrid" v-if="openFoodFacts.length && searchValue">
+            <div class="hotshotGrid" v-if="results.open_food_facts.length && search.value">
                 <Hotshot 
-                @add="hotshot => {
-                    cached.push(hotshot)
-                    selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
-                }"
-                @deduct="selected[hotshot.id]--;"
-                v-for="hotshot in openFoodFacts" disableEdit="true" :hotshot="{
-                    ...hotshot,
-                    selected: selected[hotshot.id]
-                }"/>
+                    @add="hotshot => {
+                        cached.push(hotshot)
+                        selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
+                    }"
+                    @deduct="selected[hotshot.id]--;"
+
+                    disableEdit="true"
+
+                    v-for="hotshot in results.open_food_facts" :hotshot="{
+                        ...hotshot,
+                        selected: selected[hotshot.id]
+                    }"
+                />
             </div>
+
+            <!-- Add hotshot footer -->
+            <div id="addHotshotFooter">
+                <ButtonSecondary @click="editHotshot = null; panels.manager = true;">
+                    <i class="fas fa-camera"></i>
+                    <span>Create a new hotshot</span>
+                </ButtonSecondary>
+            </div>
+
+            <BarcodeScannerUI 
+                @close="
+                    panels.barcodeUI = false;
+                    emitter.emit('hide-ui', false);
+                "
+                v-if="panels.barcodeUI" 
+            />
+
+            <transition name="slide">
+                <Panel v-if="panels.manager">
+                    <HotshotManager :barcode="this.search.searchType === 'barcode' ? this.search.value : null" :hotshot="editHotshot" @close="panels.manager = false; populateHotshots();" />
+                </Panel>
+            </transition>
         </div>
-
-        <!-- Add hotshot footer -->
-        <div id="addHotshotFooter">
-            <ButtonSecondary @click="editHotshot = null; panels.manager = true;">
-                <i class="fas fa-camera"></i>
-                <span>Create a new hotshot</span>
-            </ButtonSecondary>
-        </div>
-
-        <transition name="slide">
-            <Panel v-if="panels.manager">
-                <HotshotManager :barcode="loadedBarcode" :hotshot="editHotshot" @close="panels.manager = false; renderLocalHotshots();" />
-            </Panel>
-        </transition>
-
-        <BarcodeScannerUI @close="closeBarcodeScanner();" v-if="showBarcodeUI" />
     </section>
+
+
 </template>
 
 <style>
@@ -134,7 +147,9 @@ import Panel from "../Panel.vue";
 import HotshotManager from "./Hotshots/Manager.vue";
 
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { roundPointFive } from '../../../logic/utilities';
+import {roundPointFive} from "../../../logic/utilities";
+
+const storage = window.localStorage;
 
 export default {
     components: {
@@ -155,40 +170,28 @@ export default {
     },
     data() {
         return {
-            myHotshots: [ // Test Data
-                { 
-                    name: 'Slice of Pizza',
-                    weight: 145,
-                    carbs: 22,
-                    img: 'https://www.thepackagingcompany.us/knowledge-sharing/wp-content/uploads/sites/2/2021/04/Supplies-for-Selling-Pizza-by-the-Slice.jpg',
-                    id: "x"
-                },
-                { 
-                    name: 'Cheese Burger',
-                    weight: 113,
-                    carbs: 40,
-                    img: 'https://www.tasteofhome.com/wp-content/uploads/2020/03/Smash-Burgers_EXPS_TOHcom20_246232_B10_06_10b.jpg?fit=700,1024',
-                    id: "y"
-                }
-            ],
-            apiResults: [],
-            cached: [],
-            searchValue: "",
-            openFoodFactsLoading: false,
-            showBarcodeUI: false,
-            selected: {},
-            loadedBarcode: null,
-            panels: {
-                manager: false,
+            results: {
+                local: [],
+                bolus_calculator_api: [],
+                open_food_facts: []
             },
-            editHotshot: null,
-            foundItemFromBarcode: false
+            search: {
+                value: undefined,
+                searchType: "keyword"
+            },
+            panels: {
+                barcodeUI: false,
+                manager: false
+            },
+            loaders: {
+                open_food_facts: false
+            },
+            cached: [],
+            selected: {},
+            editHotshot: undefined
         }
     },
-    mounted() {
-        this.renderLocalHotshots();
-    },
-    computed: {
+    computed: { 
         totalCarbs() {
             let total = 0;
 
@@ -203,112 +206,178 @@ export default {
 
             return roundPointFive(total);
         },
-        myParsedHotshots() { // myHotshots after a search is counted in for.
-            if(!this.searchValue) return this.myHotshots;
-            return this.myHotshots.filter(
-                hotshot => {
-                    if(hotshot.name.toLowerCase().includes(this.searchValue.toLowerCase()))
-                        return true;
-                    if(hotshot.barcode === this.searchValue) {
-                        this.foundItemFromBarcode = true;
-                        return true;
-                    }
-                }
-            );
-        },
-        openFoodFacts() { // Parse the hotshot menu
-            if(!this.apiResults.products) { // if no products
-                // this.openFoodFactsLoading = false; // Hide the spinner
-                return []; // return empty array
-            } 
-
-            const results = this.apiResults.products.map(product => { // Get required data
-                return {
-                    name: product.product_name,
-                    weight: product.serving_size ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
-                    img: product.image_url,
-                    carbs: product.nutriments.carbohydrates_serving,
-                    id: product._id
-                }
-            })
-
-            this.openFoodFactsLoading = false; // Hide the spinner
-            return results.filter(product => product.name && product.weight && product.carbs && product.img)
-        }
+    },
+    mounted() {
+        this.populateHotshots();
     },
     methods: {
-        searchOpenFoodFacts(barcode) {
-            const url = barcode ? `https://world.openfoodfacts.org/api/v2/product/${barcode}` : `https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${this.searchValue}&search_simple=1&action=process&json=1`;
+        async populateHotshots() {
+            this.results.local = [];
+            this.results.bolus_calculator_api = [];
+            this.results.open_food_facts = [];
 
-            axios.get(url)
-            .then(res => {
-                this.apiResults = barcode ? {products:[res.data.product]} : res.data;
-                if(barcode) this.foundItemFromBarcode = true;
-            }).catch(e => {
-                switch (e.response.status) {
-                    case 404:
-                        if(!this.foundItemFromBarcode) {
-                            const confirm = window.confirm("There are no products on record for this barcode, would you like to create a hotshot for it?")
-                            if(confirm) { // show hotshot creator
-                                this.editHotshot = null; 
-                                this.panels.manager = true; 
-                            } 
-                        }
+            this.results.local = await this.getResults("local", this.search.searchType, this.search.value);
 
-                        this.apiResults = {products:[]};
-                        break;
-                
-                    default:
-                        this.apiResults = {products:[]}; // need to implement a error response.
-                        break;
-                }
-            })
+            if(this.search.value) {
+                this.results.bolus_calculator_api = await this.getResults("bolus_calculator_api", this.search.searchType, this.search.value);
+                this.results.open_food_facts = await this.getResults("open_food_facts", this.search.searchType, this.search.value);
+            }
+
+            return;
         },
-        renderLocalHotshots() {
-            const storage = window.localStorage;
-            if(storage.getItem("app_local_hotshots")) this.myHotshots = JSON.parse(storage.getItem("app_local_hotshots"));
-        },
+
         async scanBarcode() {
+            // this.search.value = "510010005";
+            // this.search.searchType = "barcode";
+            // await this.populateHotshots();
+
             const status = await BarcodeScanner.checkPermission({ force: true });
 
             if(!status.granted) return window.alert("Please allow Bolus Calculator to use your camera in your system settings.");
-            
-            // make background of WebView transparent
-            this.emitter.emit("hide-ui", true);
-            this.showBarcodeUI = true;
-        
-            const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
 
-            // const result = {hasContent: true, content:"231321"}
+            this.panels.barcodeUI = true;
+            this.emitter.emit('hide-ui', true);
+
+            const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
 
             // if the result has content
             if (result.hasContent) {
                 BarcodeScanner.stopScan();
 
-                this.emitter.emit("hide-ui", false);
-                this.showBarcodeUI = false;
+                this.panels.barcodeUI = false;
+                this.emitter.emit('hide-ui', false);
 
-                this.searchValue = result.content;
-                this.openFoodFactsLoading = true; 
-                this.apiResults=[];
+                this.search.value = result.content;
+                this.search.searchType = "barcode";
 
-                this.loadedBarcode = result.content;
-                this.searchOpenFoodFacts(result.content);
+                await this.populateHotshots();
 
-                
-                // window.alert(result.content); // log the raw scanned content
+                if(this.results.open_food_facts.length || this.results.bolus_calculator_api.length || this.results.local.length) return;
+
+                const confirm = window.confirm("There are no products on record for this barcode, would you like to create a hotshot for it?")
+                if(confirm) { // show hotshot creator
+                    this.editHotshot = null; 
+                    this.panels.manager = true; 
+                } 
             }
         },
-        closeBarcodeScanner() {
-            this.emitter.emit("hide-ui", false);
-            this.showBarcodeUI = false;
+
+        /**
+         * @param {String} source the location of the data to gather from. (local, bolus_calculator_api or open_food_facts)
+         * @param {String} type "barcode" to search by barcode || "keyword" to search by name.
+         * @param {String} searchValue barcode number or search keywords.
+         */
+        async getResults(source, inputType, searchValue) {
+            switch (source) {
+                case "local":
+                    return findLocalResults(inputType, searchValue);
+                    break;
+                case "bolus_calculator_api":
+                    return findResultsFromBolusCalculatorAPI(inputType, searchValue);
+                    break;
+                case "open_food_facts":
+                    this.loaders.open_food_facts = true;
+                    const results = await findResultsFromOpenFoodFacts(inputType, searchValue);
+                    this.loaders.open_food_facts = false;
+                    return results;
+                    break;
+                default:
+                    throw new Error("Data source not supported"); // For developers rather than users.
+                    break;
+            }
+
+            // Find hotshots from localStorage
+            function findLocalResults(inputType, searchValue) {
+                const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
+                if(!inputType || !searchValue) return hotshots; // If no search value is provided.
+
+                switch (inputType) {
+                    case "barcode":
+                        return searchByBarcode(hotshots, searchValue);
+                        break;
+                    case "keyword":
+                        return searchByKeyword(hotshots, searchValue);
+                        break;
+                }
+
+                // Find results from localStorage which match a barcode number.
+                function searchByBarcode(hotshots, searchValue) {
+                    return hotshots.filter(
+                        hotshot => hotshot.barcode === searchValue
+                    );
+                }
+
+                // Find results from localStorage which include a keyword in their name.
+                function searchByKeyword(hotshots, searchValue) {
+                    return hotshots.filter(
+                        hotshot => hotshot.name.toLowerCase().includes(
+                            searchValue.toLowerCase()
+                        )
+                    );
+                }
+            }
+
+            // Find results from an inhouse api with results submitted by the apps users.
+            async function findResultsFromBolusCalculatorAPI(inputType, searchValue) {
+                // requires implementation
+                return [];
+            }
+
+            // Find results from Open Food Facts a database of nutritional values.
+            async function findResultsFromOpenFoodFacts(inputType, searchValue) {
+                if(!inputType || !searchValue) return []; // Don't return any products by default e.g. without any search values.
+
+                switch (inputType) {
+                    case "barcode":
+                        return await searchByBarcode(searchValue);
+                        break;
+                    case "keyword":
+                        return await searchByKeyword(searchValue);
+                        break;
+                }
+
+                async function searchByBarcode(searchValue) {
+                    try {
+                        const response = 
+                            await axios.get(`https://world.openfoodfacts.org/api/v2/product/${searchValue}`);
+
+                        return parseData({products:[response.data.product]}); // products:[returnedProduct]
+                    } catch (e) {
+                        return [];
+                    }
+                }
+
+                async function searchByKeyword(searchValue) {
+                    try {
+                        const response = 
+                            await axios.get(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${searchValue}&search_simple=1&action=process&json=1`);
+
+                        return parseData(response.data);
+                    } catch (e) {
+                        return [];
+                    }
+                }
+
+                // Parse results into a format that bolus calculator can understand.
+                function parseData(data) {
+                    if(!data.products) { // if no products
+                        return []; // return empty array
+                    } 
+
+                    const results = data.products.map(product => { // Get required data
+                        return {
+                            name: product.product_name,
+                            weight: product.serving_size ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
+                            img: product.image_url,
+                            carbs: product.nutriments.carbohydrates_serving,
+                            id: product._id
+                        }
+                    })
+
+                    return results.filter(product => product.name && product.weight && product.carbs)
+                }
+            }
         },
-        deactivated() {
-            BarcodeScanner.stopScan();
-        },
-        beforeDestroy() {
-            BarcodeScanner.stopScan();
-        },
-    }
+    }, 
 }
 </script>
