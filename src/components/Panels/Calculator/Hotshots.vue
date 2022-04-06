@@ -22,7 +22,7 @@
 
         <div style="width: 95%; margin-top: 20px; margin-bottom: 100px;">
             <h3 style="font-weight: normal;">Hotshots</h3>
-                <p v-if="!results.local.length">No results found.</p>
+                <p class="hotshotError" v-if="!results.local.length">No results found.</p>
 
             <div class="hotshotGrid">
                 <!-- Render hotshots from localstorage -->
@@ -44,13 +44,35 @@
             </div>
 
             <h3 v-if="search.value" style="font-weight: normal; margin-top: 20px;">Submtted by Users</h3>
-                <p v-if="search.value">No results found.</p>
+                <p class="hotshotError" v-if="!results.bolus_calculator_api.length && search.value">{{ noDataReason.bolus_calculator_api }}</p>
+            
+            <!-- Loading Spinner -->
+            <Loader v-if="loaders.bolus_calculator_api"/>
+
+            <!-- Load hotshots from Bolus Calculator API -->
+            <div class="hotshotGrid" v-if="results.bolus_calculator_api.length && search.value">
+                <Hotshot 
+                    @add="hotshot => {
+                        cached.push(hotshot)
+                        selected[hotshot.id] ? selected[hotshot.id]++ : selected[hotshot.id] = 1;
+                    }"
+                    @deduct="selected[hotshot.id]--;"
+
+                    disableEdit="true"
+
+                    v-for="hotshot in results.bolus_calculator_api" :hotshot="{
+                        ...hotshot,
+                        selected: selected[hotshot.id]
+                    }"
+                />
+            </div>
 
             <h3 v-if="search.value" style="font-weight: normal; margin-top: 20px;">Open Food Facts</h3>
-                <p v-if="search.value && !results.open_food_facts.length">No results found.</p>
+                <p class="hotshotError" v-if="search.value && !results.open_food_facts.length">{{ noDataReason.open_food_facts }}</p>
 
             <!-- Loading Spinner -->
             <Loader v-if="loaders.open_food_facts"/>
+
             <!-- Load hotshots from Open Food Facts API -->
             <div class="hotshotGrid" v-if="results.open_food_facts.length && search.value">
                 <Hotshot 
@@ -123,6 +145,11 @@
         column-gap: 3%;
     }
 
+    .hotshotError {
+        font-size: 15px;
+        color: gray;
+    }
+
 </style>
 
 <script>
@@ -148,6 +175,7 @@ import HotshotManager from "./Hotshots/Manager.vue";
 
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import {roundPointFive} from "../../../logic/utilities";
+import hotshots from "../../../logic/hotshots";
 
 const storage = window.localStorage;
 
@@ -184,7 +212,12 @@ export default {
                 manager: false
             },
             loaders: {
-                open_food_facts: false
+                open_food_facts: false,
+                bolus_calculator_api: false,
+            },
+            noDataReason: {
+                open_food_facts: "No results found.",
+                bolus_calculator_api: "No results found."
             },
             cached: [],
             selected: {},
@@ -219,8 +252,10 @@ export default {
             this.results.local = await this.getResults("local", this.search.searchType, this.search.value);
 
             if(this.search.value) {
-                this.results.bolus_calculator_api = await this.getResults("bolus_calculator_api", this.search.searchType, this.search.value);
-                this.results.open_food_facts = await this.getResults("open_food_facts", this.search.searchType, this.search.value);
+                this.results.bolus_calculator_api 
+                    = await this.getResults("bolus_calculator_api", this.search.searchType, this.search.value);
+                this.results.open_food_facts
+                     = await this.getResults("open_food_facts", this.search.searchType, this.search.value);
             }
 
             return;
@@ -270,114 +305,99 @@ export default {
         async getResults(source, inputType, searchValue) {
             switch (source) {
                 case "local":
-                    return findLocalResults(inputType, searchValue);
+                    return hotshots.local.findLocalResults(inputType, searchValue);
                     break;
+
                 case "bolus_calculator_api":
-                    return findResultsFromBolusCalculatorAPI(inputType, searchValue);
+                    // Enable loading symbol.
+                    this.loaders.bolus_calculator_api = true;
+
+                    const bolus_calculator_api_results 
+                        = await this.findResultsFromBolusCalculatorAPI(inputType, searchValue);
+
+                    // Disable loading symbol.
+                    this.loaders.bolus_calculator_api = false;
+
+                    return bolus_calculator_api_results;
                     break;
+
                 case "open_food_facts":
+                    // Enable loading symbol.
                     this.loaders.open_food_facts = true;
-                    const results = await findResultsFromOpenFoodFacts(inputType, searchValue);
+
+                    const open_food_facts_results 
+                        = await this.findResultsFromOpenFoodFacts(inputType, searchValue);
+
+                    // Disable loading symbol.
                     this.loaders.open_food_facts = false;
-                    return results;
+                    
+                    return open_food_facts_results;
                     break;
+
                 default:
                     throw new Error("Data source not supported"); // For developers rather than users.
                     break;
             }
-
-            // Find hotshots from localStorage
-            function findLocalResults(inputType, searchValue) {
-                const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
-                if(!inputType || !searchValue) return hotshots; // If no search value is provided.
-
-                switch (inputType) {
-                    case "barcode":
-                        return searchByBarcode(hotshots, searchValue);
-                        break;
-                    case "keyword":
-                        return searchByKeyword(hotshots, searchValue);
-                        break;
-                }
-
-                // Find results from localStorage which match a barcode number.
-                function searchByBarcode(hotshots, searchValue) {
-                    return hotshots.filter(
-                        hotshot => hotshot.barcode === searchValue
-                    );
-                }
-
-                // Find results from localStorage which include a keyword in their name.
-                function searchByKeyword(hotshots, searchValue) {
-                    return hotshots.filter(
-                        hotshot => hotshot.name.toLowerCase().includes(
-                            searchValue.toLowerCase()
-                        )
-                    );
-                }
-            }
-
-            // Find results from an inhouse api with results submitted by the apps users.
-            async function findResultsFromBolusCalculatorAPI(inputType, searchValue) {
-                // requires implementation
-                return [];
-            }
-
-            // Find results from Open Food Facts a database of nutritional values.
-            async function findResultsFromOpenFoodFacts(inputType, searchValue) {
+        },
+        // Find results from an inhouse api with results submitted by the apps users.
+        async findResultsFromBolusCalculatorAPI(inputType, searchValue) {
                 if(!inputType || !searchValue) return []; // Don't return any products by default e.g. without any search values.
 
-                switch (inputType) {
-                    case "barcode":
-                        return await searchByBarcode(searchValue);
-                        break;
-                    case "keyword":
-                        return await searchByKeyword(searchValue);
-                        break;
+                try {
+                    const response = 
+                        await axios.get(`http://localhost:3000/api/hotshots/get/${inputType}/${searchValue}`);
+
+                    console.log(response.data);
+                    return response.data ?? [];
+                } catch (error) {
+                    this.handleAxiosError(error, "bolus_calculator_api");
+                    return [];
+                }
+        },
+        // Find results from Open Food Facts a database of nutritional values.
+        async findResultsFromOpenFoodFacts(inputType, searchValue) {
+            if(!inputType || !searchValue) return []; // Don't return any products by default e.g. without any search values.
+
+            let url;
+
+            // Set the api url to query from.
+            if(inputType === "barcode") {
+                url = `https://world.openfoodfacts.org/api/v2/product/${searchValue}`;
+            }
+            // If search type is a keyword search.
+            else { 
+                url = `https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${searchValue}&search_simple=1&action=process&json=1`
+            }
+
+            try {
+                const response = 
+                    await axios.get(url);
+
+                let products = response.data;
+
+                // Overwrite the products variable if search type is of barcode.
+                if(inputType === "barcode") {
+                    // Apply barcode into an array of products only including the scanned product.
+                    products = {products:[response.data.product]}
                 }
 
-                async function searchByBarcode(searchValue) {
-                    try {
-                        const response = 
-                            await axios.get(`https://world.openfoodfacts.org/api/v2/product/${searchValue}`);
-
-                        return parseData({products:[response.data.product]}); // products:[returnedProduct]
-                    } catch (e) {
-                        return [];
-                    }
-                }
-
-                async function searchByKeyword(searchValue) {
-                    try {
-                        const response = 
-                            await axios.get(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${searchValue}&search_simple=1&action=process&json=1`);
-
-                        return parseData(response.data);
-                    } catch (e) {
-                        return [];
-                    }
-                }
-
-                // Parse results into a format that bolus calculator can understand.
-                function parseData(data) {
-                    if(!data.products) { // if no products
-                        return []; // return empty array
-                    } 
-
-                    const results = data.products.map(product => { // Get required data
-                        return {
-                            name: product.product_name,
-                            weight: product.serving_size ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
-                            img: product.image_url,
-                            carbs: product.nutriments.carbohydrates_serving,
-                            id: product._id
-                        }
-                    })
-
-                    return results.filter(product => product.name && product.weight && product.carbs)
-                }
+                return hotshots.openFoodFacts.parseData(products);
+            } catch (error) {
+                this.handleAxiosError(error, "open_food_facts");
+                return [];
             }
         },
+        handleAxiosError(error, api) {
+                if(!error.response) {
+                    this.noDataReason[api] = "There has been an issue connecting to the server, have you got a stable internet connection?";
+                } else {
+                    if(error.response.status === 404) {
+                        this.noDataReason[api] = "No results found.";
+                    } else {
+                        this.noDataReason[api] = "There has been an issue with the server, please try again later.";
+                    }
+                }
+        }
     }, 
 }
 </script>
