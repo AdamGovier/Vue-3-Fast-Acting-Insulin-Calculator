@@ -31,38 +31,37 @@ import MenuItem from "../components/menu/MenuItem.vue";
 
 import { getDiaryEntries } from '../logic/diary';
 import { getDDMMYY } from '../logic/utilities';
+import { Temporal } from '@js-temporal/polyfill';
 
 export default {
     components: {
         DiaryBlock,
         MenuItem
     },
+    mounted() {
+        const now = Temporal.Now.zonedDateTimeISO();
+        const then = new Temporal.ZonedDateTime.from(now.toString())
+    },
     data() {
         return {
-            date: new Date().getTime()
+            date: Temporal.Now.zonedDateTimeISO()
         }
     },
     methods: {
-        goBackOneDay() { // Abstraction
-            this.changeDateByOneDay(false);
+        goBackOneDay() {
+           this.date = this.date.subtract({days:1})
         },
-        goForwardOneDay() { // Abstraction
-            this.changeDateByOneDay(true);
-        },
-        changeDateByOneDay(forward) {
-            const newDate = new Date(this.date);
-            forward ? newDate.setDate(newDate.getDate() + 1) : newDate.setDate(newDate.getDate() - 1); // Add or subtract one day.
-            this.date = newDate.getTime();
+        goForwardOneDay() {
+            this.date = this.date.add({days:1})
         }
     },
     computed: {
         renderDate() {
-            // https://stackoverflow.com/questions/2035699/how-to-convert-a-full-date-to-a-short-date-in-javascript
-
-            return getDDMMYY(this.date);
+            const d = this.date;
+            return d.toLocaleString('en-GB', { dateStyle: 'medium' });
         },
         diaryEntries() {
-            return getDiaryEntries(this.renderDate);
+            return getDiaryEntries(this.date);
         }
     }
 }

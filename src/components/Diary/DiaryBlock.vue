@@ -13,13 +13,13 @@
 
 <script>
 import { getHHMM } from "../../logic/utilities";
+import { Temporal } from '@js-temporal/polyfill';
 
 export default {
     props: ['entry'],
     data() {
         return {
             bloodSugarUnit: window.localStorage.getItem('app_blood_sugar_unit'),
-            time: getHHMM(new Date(this.entry.timestamp)),
             minBlood: window.localStorage.getItem("app_minimum_blood_sugar"),
             maxBlood: window.localStorage.getItem("app_maximum_blood_sugar")
         }
@@ -33,6 +33,11 @@ export default {
         },
         bloodCategoryHigh() {
             return (this.entry.bloodGlucose > this.maxBlood); // returns boolean
+        },
+        time() {
+            const entryDate = new Temporal.ZonedDateTime.from(this.entry.timestamp);
+            // .slice(-2) so 8 minutes past becomes 08 and 18 minutes past does not become 018 minutes past.
+            return `${entryDate.hour}:${('0' + entryDate.minute).slice(-2)}`;
         }
     },
 }
