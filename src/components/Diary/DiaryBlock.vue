@@ -13,7 +13,6 @@
 
 <script>
 import { getHHMM } from "../../logic/utilities";
-import { Temporal } from '@js-temporal/polyfill';
 
 export default {
     props: ['entry'],
@@ -35,7 +34,7 @@ export default {
             return (this.entry.bloodGlucose > this.maxBlood); // returns boolean
         },
         time() {
-            const entryDate = new Temporal.ZonedDateTime.from(this.entry.timestamp);
+            const entryDate = new Temporal.PlainDateTime.from(this.entry.timestamp);
             // .slice(-2) so 8 minutes past becomes 08 and 18 minutes past does not become 018 minutes past.
             return `${entryDate.hour}:${('0' + entryDate.minute).slice(-2)}`;
         }

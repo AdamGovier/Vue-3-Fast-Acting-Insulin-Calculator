@@ -30,21 +30,15 @@ import DiaryBlock from "../components/Diary/DiaryBlock.vue";
 import MenuItem from "../components/menu/MenuItem.vue";
 
 import { getDiaryEntries } from '../logic/diary';
-import { getDDMMYY } from '../logic/utilities';
-import { Temporal } from '@js-temporal/polyfill';
 
 export default {
     components: {
         DiaryBlock,
         MenuItem
     },
-    mounted() {
-        const now = Temporal.Now.zonedDateTimeISO();
-        const then = new Temporal.ZonedDateTime.from(now.toString())
-    },
     data() {
         return {
-            date: Temporal.Now.zonedDateTimeISO()
+            date: Temporal.Now.plainDateTimeISO()
         }
     },
     methods: {
