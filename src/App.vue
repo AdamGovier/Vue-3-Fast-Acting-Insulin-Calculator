@@ -5,6 +5,8 @@
   <main :class="{hideUi:!ui, lockScroll}">
       <router-view/>
   </main>
+
+  <DebuggingMenu/>
 </template>
 
 <style>
@@ -14,10 +16,13 @@
 <script>
 // Components
 import ActionBar from './components/root/ActionBar.vue';
+// Dev Components
+import DebuggingMenu from './components/Other/DebuggingMenu.vue'
 
 export default {
   components: {
-    ActionBar
+    ActionBar,
+    DebuggingMenu
   },
   data() {
     return {

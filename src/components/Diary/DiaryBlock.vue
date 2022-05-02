@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import { getHHMM } from "../../logic/utilities";
-
 export default {
     props: ['entry'],
     data() {

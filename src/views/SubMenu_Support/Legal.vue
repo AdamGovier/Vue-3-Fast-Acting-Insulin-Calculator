@@ -6,7 +6,10 @@
             <p>Please accept the new Terms & Conditions below.</p>
         </div>
 
-        <h1>Things to Note</h1>
+        <PannelHeader>
+            Things to Note
+        </PannelHeader>
+
         <LegalBlock>
             <p>
                 Bolus Calculator was made by a diabetic not a medical professional, Bolus Calculator is not commercial e.g. 
@@ -20,7 +23,10 @@
             </p>
         </LegalBlock>
 
-        <h1 style="margin-top: 40px;">Terms and Conditions</h1>
+        <PannelHeader>
+            Terms and Conditions
+        </PannelHeader>
+
         <LegalBlock>
             <p>
                 <strong>1.) Agreement to Terms</strong>
@@ -48,7 +54,7 @@
             <br/>
             <p>
                 <strong>1.5</strong> 
-                You are aware that you are fully responsible for what you do with any outputted data and can not take legal action for any incorrect data.
+                You are aware that you are fully responsible for what you do with any outputted data and I can not take legal action for any incorrect data.
             </p>
             <br/>
             <p>
@@ -67,19 +73,21 @@
             </p>
         </LegalBlock>
 
-         <ButtonPrim value="Accept" @click="acceptTerms()" v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" />
-         <ButtonPrim :value="`Accepted ${getAcceptedDateString}`" v-else disabled="true" />
+        <ButtonPrim value="Accept" @click="acceptTerms()" v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" />
+        <ButtonPrim :value="`Accepted ${getAcceptedDateString}`" v-else disabled="true" />
     </section>
 </template>
 
 <script>
 import LegalBlock from '../../components/Other/LegalBlock.vue';
 import ButtonPrim from '../../components/Buttons/Primary.vue';
+import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 
 export default {
     components: {
         LegalBlock,
-        ButtonPrim
+        ButtonPrim,
+        PannelHeader
     },
     data() {
         return {

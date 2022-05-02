@@ -16,6 +16,7 @@ import SupportMenu from '../views/SupportMenu.vue';
 import Legal from '../views/SubMenu_Support/Legal.vue';
 import Contact from "../views/SubMenu_Support/Contact.vue";
 import Tutorials from "../views/SubMenu_Support/Tutorials.vue";
+import MyData from "../views/SubMenu_Support/MyData.vue";
 
 const routes = [
   {
@@ -76,6 +77,10 @@ const routes = [
   {
     path: "/support/Tutorials",
     component: Tutorials
+  },
+  {
+    path: "/support/Data",
+    component: MyData
   }
 
   // End of support menu and children.

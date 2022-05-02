@@ -1,6 +1,8 @@
 <template>
     <section class="horizCentre">
-        <h1 style="margin-block-end: 20px;">Correction Settings</h1>
+        <PannelHeader>
+            Correction Settings
+        </PannelHeader>
         
         <div style="width: 90%;">
             <Option title="Blood Sugar Unit" centre="true">
@@ -99,6 +101,7 @@ import InputError from '../../components/Options/InputError.vue';
 import BtnPrimary from '../../components/Buttons/Primary.vue';
 
 import Panel from '../../components/Panels/Panel.vue';
+import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import CorrectionFactorPanel from '../../components/Panels/CorrectionSettings/correctionFactorPanel.vue';
 
 export default {
@@ -113,7 +116,8 @@ export default {
         BtnPrimary,
         Panel,
         CorrectionFactorPanel,
-        InputError
+        InputError,
+        PannelHeader
     },
     data() {
         return {

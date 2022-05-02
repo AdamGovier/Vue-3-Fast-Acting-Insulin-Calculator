@@ -9,7 +9,26 @@
         <div style="width: 95%; margin-top: 20px;">
             <Option>
                 <InputArea>
-                    <Input type="text" placeholder="Search.." :value="search.value" @new-data="value => {search.value = value;}" @data-changed="search.searchType = 'keyword'; populateHotshots();" />
+
+                    <Input type="text" placeholder="Search.." 
+
+                     :value="search.value"
+                     
+                     @new-data="
+                        noDataReason.bolus_calculator_api = '';
+                        noDataReason.open_food_facts = '';
+                     " 
+
+                     @data-changed="
+                        value => {
+                            search.value = value;
+                            search.searchType = 'keyword'; 
+                            populateHotshots();
+                        }
+                     " 
+
+                    />
+
                     <InputButton icon="fas fa-camera" @click="scanBarcode();" />
                 </InputArea>
                 <OptionLabel>
@@ -216,8 +235,8 @@ export default {
                 bolus_calculator_api: false,
             },
             noDataReason: {
-                open_food_facts: "No results found.",
-                bolus_calculator_api: "No results found."
+                open_food_facts: "",
+                bolus_calculator_api: ""
             },
             cached: [],
             selected: {},
@@ -347,7 +366,6 @@ export default {
                     const response = 
                         await axios.get(`http://localhost:3000/api/hotshots/get/${inputType}/${searchValue}`);
 
-                    console.log(response.data);
                     return response.data ?? [];
                 } catch (error) {
                     this.handleAxiosError(error, "bolus_calculator_api");

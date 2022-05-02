@@ -1,8 +1,10 @@
 <template>
     <section class="horizCentre">
-        <h1 style="margin-block-end: 20px;">Dose Settings</h1>
+        <PannelHeader>
+            Dose Settings
+        </PannelHeader>
         
-        <div style="width: 90%; margin-top: 20px;">
+        <div style="width: 90%;">
             <Option title="Insulin To Carb Ratio">
                 <InputError :value="errors.carbRatio" v-if="errors.carbRatio" />
                 <InputArea>
@@ -37,6 +39,7 @@ import OptionLabel from '../../components/Options/OptionLabel.vue';
 import InputError from '../../components/Options/InputError.vue';
 
 import BtnPrimary from '../../components/Buttons/Primary.vue';
+import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 
 export default {
     components: {
@@ -47,7 +50,8 @@ export default {
         InputButton,
         OptionLabel,
         InputError,
-        BtnPrimary
+        BtnPrimary,
+        PannelHeader
     },
     updated() {
         this.emitter.emit("exit-without-saving-dialog", true);

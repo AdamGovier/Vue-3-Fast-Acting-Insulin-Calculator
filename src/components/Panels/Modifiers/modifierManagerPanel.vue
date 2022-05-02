@@ -102,9 +102,7 @@ export default {
                 addition: false, // Addition=true to add percentage to dose or =false to deduct
                 scheduler: false
             },
-            errors: {
-
-            }
+            errors: {}
         }
     },
     updated() {

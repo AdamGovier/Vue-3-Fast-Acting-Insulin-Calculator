@@ -7,10 +7,16 @@ exports.openFoodFacts = {
             return []; // return empty array
         } 
 
+        try {
+            /[0-9]g/.test("100g")
+        } catch(e) {
+            console.log(e);
+        }
+
         const results = data.products.map(product => { // Get required data
             return {
                 name: product.product_name,
-                weight: product.serving_size ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
+                weight: /[0-9][^a-f h-z A-F H-Z]/.test(product.serving_size) ? product.serving_size.split("g")[0] : undefined, // if grams is in the digit.
                 img: product.image_url,
                 carbs: product.nutriments.carbohydrates_serving,
                 id: product._id
