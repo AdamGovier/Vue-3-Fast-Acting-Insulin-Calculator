@@ -35,19 +35,37 @@ export default {
             doc.text("Application Data", 55, 33);
             doc.addImage(this.$pdf.logo.data, "JPEG", 15, 10, 30, 30);
 
+            const diary = JSON.parse(window.localStorage.getItem("app_diary"));
+
+            const body = diary.map(entry => {
+                const dateTime = new Temporal.PlainDateTime.from(entry.timestamp);
+
+                const modifiers = entry.modifiers.map(modifier => {
+                    // e.g. Exercise: +15% 
+                    return `${modifier.name}: ${modifier.addition ? "+" : "-"}${modifier.percentage}%`;
+                }).join(", ");
+
+                return [
+                    dateTime.toLocaleString('en-GB', { dateStyle: 'medium' }), // DD MM YYYY
+                    `${dateTime.hour}:${('0' + dateTime.minute).slice(-2)}`, // HH:MM
+
+                    entry.carbohydrates,
+                    entry.bloodGlucose || "N/A",
+                    entry.units,
+
+                    modifiers || "N/A",
+                    `1:${entry.ratio}`
+                ];
+            });
 
             // Raw Data
             autoTable(doc, {
                 head: [['Date', 'Time', 'Carbohydrates', 'Blood Glucose', 'Units', 'Modifiers', 'Ratio']],
-                body: [
-                    ['02/05/2022', '11:09', 80, 8.1, 13.5, 'N/A', '1:8'],
-                    ['02/05/2022', '14:23', 95, 13.2, 16.5, 'Work ( +20% )', '1:8'],
-                    // ...
-                ],
+                body,
                 headStyles: {
                     fillColor: '#ef4d5a'
                 },
-                margin: { top: 60 },
+                margin: { top: 55 },
             })
 
             doc.save("a4.pdf");

@@ -32,10 +32,10 @@
         </BtnSecondary>
 
         <!-- If modifiers are enabled. -->
-        <div style="width: 40%; margin-top: 20px;" v-if="renderSelectedModifiers.length"> 
+        <div style="width: 40%; margin-top: 20px;" v-if="selectedModiferNames"> 
             <p style="text-align: center;">
                 Selected Modifiers:
-                <span class="selectedModifier" v-for="modifier in renderSelectedModifiers">{{ modifier }}</span>
+                <span style="color: var(--action-colour);">{{ selectedModiferNames }}</span>
             </p>
         </div>
 
@@ -130,20 +130,10 @@
             }
         },
         computed: {
-            renderSelectedModifiers() { // Create a csv list for a paragraph showing selected modifiers.
-                let filtered = this.modifiers.filter(modifier => modifier.checked);
-
-                let selected = [];
-
-                for (let i = 0; i < filtered.length; i++) { // If last item do not put in a comma.
-                    if(i !== filtered.length - 1) {
-                        selected.push(filtered[i].name + ", ");
-                    } else {
-                        selected.push(filtered[i].name);
-                    }
-                }
-
-                return selected;
+            selectedModiferNames() { // Create a csv list for a paragraph showing selected modifiers.
+                return this.modifiers.filter(modifier => modifier.checked) // Get selected modifiers
+                 .map(modifier => modifier.name) // Return modifier names.
+                 .join(', '); // Create CSV
             }
         },
         methods: {
@@ -169,7 +159,8 @@
                     carbohydrates: this.values.carbohydrates,
                     bloodGlucose: this.values.bloodGlucose,
                     units: this.values.units,
-                    modifiers: selectedModifiers
+                    modifiers: selectedModifiers,
+                    ratio: window.localStorage.getItem("app_carb_ratio")
                 });
             },
             /**

@@ -51,8 +51,8 @@ export default {
     },
     computed: {
         renderDate() {
-            const d = this.date;
-            return d.toLocaleString('en-GB', { dateStyle: 'medium' });
+            const date = this.date;
+            return date.toLocaleString('en-GB', { dateStyle: 'medium' });
         },
         diaryEntries() {
             return getDiaryEntries(this.date);

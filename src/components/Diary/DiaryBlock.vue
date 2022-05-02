@@ -1,10 +1,11 @@
 <template>
     <div class="diaryHolder" :class="{goodBG:bloodCategoryGood, hypoBG: bloodCategoryLow, hyperBG: bloodCategoryHigh, noBG: !entry.bloodGlucose}">
-        <h5>{{ entry.bloodGlucose ? entry.bloodGlucose : "N/A" }}</h5>
+        <h5>{{ entry.bloodGlucose || "N/A" }}</h5>
         <span>
             <p>
                 {{ entry.units }}U <i class="fas fa-syringe"></i> 
             </p>
+            <!-- If bloods are not provided do not include the unit of measurement. -->
             {{ entry.bloodGlucose ? bloodSugarUnit : ''}}
         </span>
         <h4>{{ time }}</h4>
