@@ -13,6 +13,8 @@
 <script>
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Browser } from '@capacitor/browser';
 
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
@@ -23,7 +25,7 @@ export default {
         BtnSecondary
     },
     methods: {
-        exportPDF() {
+        async exportPDF() {
             console.log("Attempting to export.");
 
             const doc = new jsPDF();
@@ -68,7 +70,35 @@ export default {
                 margin: { top: 55 },
             })
 
-            doc.save("a4.pdf");
+            const fileData = doc.output("datauristring");
+            const date = Temporal.Now.plainDateTimeISO.toString();
+            const filename = `Bolus-Calc-${date}.pdf`;
+
+            await Filesystem.writeFile({
+                path: filename,
+                data: fileData,
+                directory: Directory.Documents,
+            });
+
+            const uriResult = await Filesystem.getUri({
+                directory: Directory.Documents,
+                path: filename
+            });
+
+            const path = uriResult.uri;
+            // await PdfViewer.show({ url: path })
+            // alert(path);
+            // await Browser.open({ url: path });
+            // await FileOpener.open(path, "application/pdf");
+            // alert(path)
+
+            // const contents = await Filesystem.readFile({
+            //     path: 'text.txt',
+            //     directory: Directory.Documents,
+            //     encoding: Encoding.UTF8,
+            // });
+
+            // alert(contents);
         }
     }
 }
