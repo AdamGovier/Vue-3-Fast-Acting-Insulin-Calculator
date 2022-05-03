@@ -15,6 +15,9 @@ import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Browser } from '@capacitor/browser';
+import { Share } from '@capacitor/share';
+// import { FileOpener } from '@ionic-native/file-opener';
+// import fileOpener2 from "cordova-plugin-file-opener2/www/plugins.FileOpener2";
 
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
@@ -48,7 +51,11 @@ export default {
                 }).join(", ");
 
                 return [
-                    dateTime.toLocaleString('en-GB', { dateStyle: 'medium' }), // DD MM YYYY
+                    dateTime.toLocaleString('en-gb', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    }), // e.g. 03 August 2022
                     `${dateTime.hour}:${('0' + dateTime.minute).slice(-2)}`, // HH:MM
 
                     entry.carbohydrates,
@@ -71,7 +78,11 @@ export default {
             })
 
             const fileData = doc.output("datauristring");
-            const date = Temporal.Now.plainDateTimeISO.toString();
+            const date = Temporal.Now.plainDateISO().toLocaleString('en-gb', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
             const filename = `Bolus-Calc-${date}.pdf`;
 
             await Filesystem.writeFile({
@@ -86,19 +97,14 @@ export default {
             });
 
             const path = uriResult.uri;
-            // await PdfViewer.show({ url: path })
-            // alert(path);
-            // await Browser.open({ url: path });
-            // await FileOpener.open(path, "application/pdf");
-            // alert(path)
-
-            // const contents = await Filesystem.readFile({
-            //     path: 'text.txt',
-            //     directory: Directory.Documents,
-            //     encoding: Encoding.UTF8,
-            // });
-
-            // alert(contents);
+            
+            // Not an ideal solution, but works for now. // https://stackoverflow.com/questions/67943445/capacitor-3-and-vuejs-open-saved-file-or-download?newreg=e131f0a8e4b94d3abb69fa01ea38642c
+            await Share.share({
+                title: filename,
+                text: 'PDF containing data from Bolus Calculator',
+                url: path,
+                dialogTitle: 'Export PDF',
+            });
         }
     }
 }
