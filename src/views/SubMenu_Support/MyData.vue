@@ -19,6 +19,8 @@ import { Share } from '@capacitor/share';
 // import { FileOpener } from '@ionic-native/file-opener';
 // import fileOpener2 from "cordova-plugin-file-opener2/www/plugins.FileOpener2";
 
+import { Analytics, generateFakeDiary } from '../../logic/analytics';
+
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
 
@@ -30,6 +32,26 @@ export default {
     methods: {
         async exportPDF() {
             console.log("Attempting to export.");
+
+            // Test Data // Comment out or remove in production.
+            generateFakeDiary(1000);
+
+            const now = Temporal.Now.plainDateTimeISO();
+            const startDate = now.subtract({days: 30}); // Last 30 days.
+
+            const analytics = new Analytics(JSON.parse(window.localStorage.getItem("app_diary")) || []);
+
+            console.log(
+                analytics
+                 .before(now)
+                 .after(startDate)
+                 .average("bloodGlucose", 'mode')
+                 .average("carbohydrates", 'median')
+                 .results
+            );
+            // getAnalytics(startDate, endDate);
+
+            return;
 
             const doc = new jsPDF();
 
@@ -76,6 +98,9 @@ export default {
                 },
                 margin: { top: 55 },
             })
+
+            doc.save();
+            return;
 
             const fileData = doc.output("datauristring");
             const date = Temporal.Now.plainDateISO().toLocaleString('en-gb', {
