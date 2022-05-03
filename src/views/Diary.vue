@@ -52,7 +52,11 @@ export default {
     computed: {
         renderDate() {
             const date = this.date;
-            return date.toLocaleString('en-GB', { dateStyle: 'medium' });
+            return date.toLocaleString('en-gb', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            })
         },
         diaryEntries() {
             return getDiaryEntries(this.date);
