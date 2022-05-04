@@ -20,6 +20,7 @@ import { Share } from '@capacitor/share';
 // import fileOpener2 from "cordova-plugin-file-opener2/www/plugins.FileOpener2";
 
 import { Analytics, generateFakeDiary } from '../../logic/analytics';
+import { renderGraphToImage, createRangeGraph } from "../../logic/graphs";
 
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
@@ -33,25 +34,35 @@ export default {
         async exportPDF() {
             console.log("Attempting to export.");
 
+            // If user has not used the calculator thus no data.
+            if(!window.localStorage.getItem("app_diary")) return window.alert('No data available!');
+            const diary = JSON.parse(window.localStorage.getItem("app_diary"));
+
             // Test Data // Comment out or remove in production.
-            generateFakeDiary(1000);
+            generateFakeDiary(100);
+
+            // analytic data.
 
             const now = Temporal.Now.plainDateTimeISO();
             const startDate = now.subtract({days: 30}); // Last 30 days.
+            console.log(startDate);
 
-            const analytics = new Analytics(JSON.parse(window.localStorage.getItem("app_diary")) || []);
+            const analytics = new Analytics(diary);
 
-            console.log(
+            const minBloodSugar = parseFloat(window.localStorage.getItem("app_minimum_blood_sugar"));
+            const maxBloodSugar = parseFloat(window.localStorage.getItem("app_maximum_blood_sugar"));
+
+            // get required analytics
+            const past30DaysResult =
                 analytics
-                 .before(now)
                  .after(startDate)
-                 .average("bloodGlucose", 'mode')
-                 .average("carbohydrates", 'median')
-                 .results
-            );
-            // getAnalytics(startDate, endDate);
+                 .percentageRange({start:minBloodSugar, end:maxBloodSugar}, "bloodGlucose", "inTarget")
+                 .percentageRange({start:maxBloodSugar + 0.1}, "bloodGlucose", "high")
+                 .percentageRange({end:minBloodSugar - 0.1}, "bloodGlucose", "low");
 
-            return;
+
+            console.log(past30DaysResult);
+            // console.log(JSON.stringify(past30DaysResult.diary));
 
             const doc = new jsPDF();
 
@@ -62,9 +73,14 @@ export default {
             doc.text("Application Data", 55, 33);
             doc.addImage(this.$pdf.logo.data, "JPEG", 15, 10, 30, 30);
 
-            const diary = JSON.parse(window.localStorage.getItem("app_diary"));
+            const rangeGraph = renderGraphToImage(createRangeGraph(
+                [`Higher than ${maxBloodSugar}`, `Within ${minBloodSugar} - ${maxBloodSugar}`, `Lower than ${minBloodSugar}`],
+                [past30DaysResult.results.range.high.toFixed(1), past30DaysResult.results.range.inTarget.toFixed(1), past30DaysResult.results.range.low.toFixed(1)]
+            ));
 
-            const body = diary.map(entry => {
+            doc.addImage((rangeGraph), "PNG", 20, 50, 150, 80);
+
+            const body = past30DaysResult.diary.map(entry => {
                 const dateTime = new Temporal.PlainDateTime.from(entry.timestamp);
 
                 const modifiers = entry.modifiers.map(modifier => {
@@ -96,7 +112,7 @@ export default {
                 headStyles: {
                     fillColor: '#ef4d5a'
                 },
-                margin: { top: 55 },
+                startY: 150
             })
 
             doc.save();

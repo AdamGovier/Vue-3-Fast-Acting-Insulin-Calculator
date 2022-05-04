@@ -171,10 +171,10 @@ export default {
                 const storage = window.localStorage;
 
                 storage.setItem('app_blood_sugar_unit', this.values.bloodSugarUnit);
-                storage.setItem('app_correction_factor', this.values.correctionFactor);
-                storage.setItem('app_minimum_blood_sugar', this.values.minimumBloodSugar);
-                storage.setItem('app_maximum_blood_sugar', this.values.maximumBloodSugar);
-                storage.setItem('app_target_blood_sugar', this.values.targetBloodSugar);
+                storage.setItem('app_correction_factor', parseFloat(this.values.correctionFactor));
+                storage.setItem('app_minimum_blood_sugar', parseFloat(this.values.minimumBloodSugar));
+                storage.setItem('app_maximum_blood_sugar', parseFloat(this.values.maximumBloodSugar));
+                storage.setItem('app_target_blood_sugar', parseFloat(this.values.targetBloodSugar));
 
                 // Disable ActionBar override.
                 if(!storage.getItem('app_launched_before')) {

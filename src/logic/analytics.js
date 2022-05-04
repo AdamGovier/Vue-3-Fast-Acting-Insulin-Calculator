@@ -3,7 +3,7 @@
 // Fluent Interface
 
 import averages from "./analytics/averages.js";
-
+import standardDeviation from "just-standard-deviation";
 
 /**
  * @description This is the Bolus Calculator Analytics API. Documentation is coming soon.
@@ -19,6 +19,15 @@ export class Analytics {
                 mean:{},
                 median:{},
                 mode: {}
+            },
+            groups:{
+
+            },
+            sDeviation: {
+
+            },
+            range: {
+                
             }
         };
     }
@@ -41,6 +50,12 @@ export class Analytics {
         return this;
     }
     
+    sDeviation(property) {
+        const sdArray = this.diary.map(entry => parseFloat(entry[property]));
+        this.results.sDeviation[property] = standardDeviation(sdArray);  
+        
+        return this;
+    }
 
     /**
      * Gets required average 
@@ -66,6 +81,131 @@ export class Analytics {
         }
 
         return this;
+    }
+
+    /**
+     * @description returns a percentage of which the values of property fall within range. accessed from ```results.range[name]```
+     * @param Object range, object contain a start of range and end of range. the range is inclusive so for example 4.5 & 10.0 would be included. ```e.g. [{start:4.5, end:10.0}]```
+     * @param String property, the name of the property to find percentage range of.
+     * @param String name, a key which you can use to access the result. ```results.range[name]```
+     */
+    percentageRange(range, property, name) {
+        let tracking = {inRange: 0, outOfRange: 0};
+
+        this.diary.forEach(entry => {
+            if(isNaN(entry[property])) 
+                throw new Error("Invalid data inside of diary, Or invalid range property.");
+
+            if(!entry[property]) return; // If entry property is blank.
+
+            // if one range value is left unspecified just validate as true
+            if((range.start ? entry[property] >= range.start : true) && (range.end ? entry[property] <= range.end : true)) {
+                tracking.inRange++;
+            } else {
+                tracking.outOfRange++;
+            }
+        });
+
+        // Simple percentage calculation. score / total * 100
+        this.results.range[name] = tracking.inRange / (tracking.inRange + tracking.outOfRange) * 100;
+        return this;
+    }
+
+    /**
+     * @description creates an object containing multiple keys of a property value which then contain a sub array of diary entries. 
+     * @param String name, the name of the group. ```results.groups[name]```
+     * @param String property, the property to group by. ```e.g. bloodGlucose```
+     */
+    createGroup(name, property) {
+        let groups = {};
+
+        this.diary.forEach(entry => {
+            if(!groups[entry[property]]) groups[entry[property]] = []; // if key does not exist init a blank array as value of key.
+            groups[entry[property]].push(entry); // push to group
+        });
+
+        this.results.groups[name] = groups;
+        return this;
+    }
+
+    /**
+     * @description creates an object containing multiple keys of a date which then contain a sub array of diary entries. grouped by date.
+     * @param String name, the name of the group. ```results.groups[name]```
+     * @param String format, the format to group by: allowed values are: ```hour``` or ```day``` or ```day-of-week``` or ```week``` or ```month``` or ```dd-mm-yyyy```.
+     */
+    createGroupByDate(name, format) {
+
+        // https://stackoverflow.com/questions/54130283/single-loop-containing-multiple-if-statements-or-multiple-if-statements-with-loo
+        
+        switch (format) {
+            case "hour":
+                this.results.groups[name] = groupByDate(this.diary, returnHourKey);
+                break;
+
+            case "day":
+                this.results.groups[name] = groupByDate(this.diary, returnDayKey);
+                break;
+    
+            case "day-of-week":
+                this.results.groups[name] = groupByDate(this.diary, returnDayOfWeekKey);
+                break;
+
+            case "week":
+                this.results.groups[name] = groupByDate(this.diary, returnWeekKey);
+                break;
+
+            case "month":
+                this.results.groups[name] = groupByDate(this.diary, returnMonthKey);
+                break;
+
+            case "dd-mm-yyyy":
+                this.results.groups[name] = groupByDate(this.diary, returnFullDateKey);
+                break;
+
+            default:
+                throw new Error("Incompatible date format.");
+        }
+
+        return this;
+
+        function groupByDate(diary, keyMethod) {
+            let groups = {};
+
+            diary.forEach(entry => {
+                const entryDate = new Temporal.PlainDateTime.from(entry.timestamp);
+                
+                const key = keyMethod(entryDate); // Get key with suplied method from the paramater. e.g. returnDayKey => 13
+
+                if(!groups[key]) groups[key] = []; // if key does not exist init a blank array as value of key.
+                groups[key].push(entry); // push to group
+            });
+        
+            return groups;
+        }
+
+        function returnDayKey(entryDate) {
+            return entryDate.day;
+        }
+
+        function returnHourKey(entryDate) {
+            return entryDate.hour;
+        }
+
+        function returnDayOfWeekKey(entryDate) {
+            return entryDate.dayOfWeek;
+        }
+
+        function returnWeekKey(entryDate) {
+            return entryDate.weekOfYear;
+        }
+
+        function returnMonthKey(entryDate) {
+            return entryDate.month;
+        }
+
+        function returnFullDateKey(entryDate) {
+            return `${('0' + entryDate.day).slice(-2)}-${('0' + entryDate.month).slice(-2)}-${entryDate.year}`;
+        }
     }
 }
 
