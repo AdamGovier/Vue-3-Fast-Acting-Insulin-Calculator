@@ -39,13 +39,12 @@ export default {
             const diary = JSON.parse(window.localStorage.getItem("app_diary"));
 
             // Test Data // Comment out or remove in production.
-            generateFakeDiary(100);
+            // generateFakeDiary(100);
 
             // analytic data.
 
             const now = Temporal.Now.plainDateTimeISO();
             const startDate = now.subtract({days: 30}); // Last 30 days.
-            console.log(startDate);
 
             const analytics = new Analytics(diary);
 
@@ -115,8 +114,8 @@ export default {
                 startY: 150
             })
 
-            doc.save();
-            return;
+            // doc.save();
+            // return;
 
             const fileData = doc.output("datauristring");
             const date = Temporal.Now.plainDateISO().toLocaleString('en-gb', {
