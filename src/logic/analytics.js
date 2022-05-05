@@ -83,6 +83,40 @@ export class Analytics {
         return this;
     }
 
+    // Underworks, documentation soon when have full solution.
+    // Ideally will become timesplitAverage(6); for example will split day into 6 parts and work out 6 averages.
+    fourHourAvg() {
+        this.createGroupByDate("bcFourHourAvg", "hour")
+
+        const hours = this.results.groups.bcFourHourAvg;
+
+        // Poor solution will come back to later.
+        const divisons = [
+            [...hours[0] || [], ...hours[1] || [], ...hours[2] || [], ...hours[3] || []],
+            [...hours[4] || [], ...hours[5] || [], ...hours[6] || [], ...hours[7] || []],
+            [...hours[8] || [], ...hours[9] || [], ...hours[10] || [], ...hours[11] || []],
+            [...hours[12] || [], ...hours[13] || [], ...hours[14] || [], ...hours[15] || []],
+            [...hours[16] || [], ...hours[17] || [], ...hours[18] || [], ...hours[19] || []],
+            [...hours[20] || [], ...hours[21] || [], ...hours[22] || [], ...hours[23] || []],
+        ];
+
+        const property = "bloodGlucose";
+
+        // 🤮 underworks temp solution!
+        const avgs = [
+            averages.getMean(divisons[0], property).toFixed(1),
+            averages.getMean(divisons[1], property).toFixed(1),
+            averages.getMean(divisons[2], property).toFixed(1),
+            averages.getMean(divisons[3], property).toFixed(1),
+            averages.getMean(divisons[4], property).toFixed(1),
+            averages.getMean(divisons[5], property).toFixed(1)
+        ]
+
+        this.results.groups.bcFourHourAvg = avgs;
+
+        return this;
+    }
+
     /**
      * @description returns a percentage of which the values of property fall within range. accessed from ```results.range[name]```
      * @param Object range, object contain a start of range and end of range. the range is inclusive so for example 4.5 & 10.0 would be included. ```e.g. [{start:4.5, end:10.0}]```

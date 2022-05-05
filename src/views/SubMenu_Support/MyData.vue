@@ -20,7 +20,7 @@ import { Share } from '@capacitor/share';
 // import fileOpener2 from "cordova-plugin-file-opener2/www/plugins.FileOpener2";
 
 import { Analytics, generateFakeDiary } from '../../logic/analytics';
-import { renderGraphToImage, createRangeGraph } from "../../logic/graphs";
+import { renderGraphToImage, createRangeGraph, createTimedAverageGraph } from "../../logic/graphs";
 
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
@@ -39,7 +39,7 @@ export default {
             const diary = JSON.parse(window.localStorage.getItem("app_diary"));
 
             // Test Data // Comment out or remove in production.
-            // generateFakeDiary(100);
+            generateFakeDiary(100);
 
             // analytic data.
 
@@ -55,29 +55,90 @@ export default {
             const past30DaysResult =
                 analytics
                  .after(startDate)
+                 .before(now)
+                 .average("bloodGlucose", "mean")
                  .percentageRange({start:minBloodSugar, end:maxBloodSugar}, "bloodGlucose", "inTarget")
                  .percentageRange({start:maxBloodSugar + 0.1}, "bloodGlucose", "high")
-                 .percentageRange({end:minBloodSugar - 0.1}, "bloodGlucose", "low");
-
+                 .percentageRange({end:minBloodSugar - 0.1}, "bloodGlucose", "low")
+                 .fourHourAvg();
 
             console.log(past30DaysResult);
-            // console.log(JSON.stringify(past30DaysResult.diary));
 
             const doc = new jsPDF();
 
             // Branding & Title
+            doc.addImage(require("../../assets/images/icons/logo.png"), "JPEG", 14, 10, 30, 30);
+
             doc.setFontSize(30);
-            doc.text("Bolus Calculator", 55, 23);
+            doc.setFont("Helvetica", "Bold");
+
+            doc.text("Bolus Calculator", 53, 23);
+
             doc.setFontSize(20);
-            doc.text("Application Data", 55, 33);
-            doc.addImage(this.$pdf.logo.data, "JPEG", 15, 10, 30, 30);
+            doc.setFont("Helvetica", "");
+
+            doc.text("Application Data", 53, 33);
+
+            // 30 Day Average
+
+            doc.setFont("Helvetica", "Bold");
+            doc.setFontSize(15);
+            doc.text("Previous 30 days.", 14, 61.5);
+            
+            doc.rect(14, 65, 180, 100, 'S')
+            doc.addImage(require("../../assets/images/icons/fontAwesome/smile.png"), "JPEG", 90, 82.5, 30, 30);
+
+            // Display Average
+
+            doc.setTextColor(107,142,35);
+
+            if(past30DaysResult.results.averages.mean.bloodGlucose > maxBloodSugar) doc.setTextColor(255,140,0);
+            if(past30DaysResult.results.averages.mean.bloodGlucose < minBloodSugar) doc.setTextColor(139,0,0);
+
+            doc.setFontSize(20);
+            doc.text(`${past30DaysResult.results.averages.mean.bloodGlucose.toFixed(1)} mmol/L`, 87, 131.5);
+
+            // Sub heading
+
+            doc.setFontSize(18);
+            doc.setTextColor(0,0,0);
+            doc.setFont("Helvetica", "");
+
+            doc.text("Average Blood Glucose Level", 62, 141.5);
+
+            // rangeGraph
 
             const rangeGraph = renderGraphToImage(createRangeGraph(
                 [`Higher than ${maxBloodSugar}`, `Within ${minBloodSugar} - ${maxBloodSugar}`, `Lower than ${minBloodSugar}`],
                 [past30DaysResult.results.range.high.toFixed(1), past30DaysResult.results.range.inTarget.toFixed(1), past30DaysResult.results.range.low.toFixed(1)]
             ));
 
-            doc.addImage((rangeGraph), "PNG", 20, 50, 150, 80);
+            doc.setFontSize(15);
+            doc.setFont("Helvetica", "");
+            doc.text("Time in Target.", 14, 176.5);
+
+            doc.rect(14, 180, 180, 100, 'S')
+            doc.addImage((rangeGraph), "PNG", 17.5, 185, 170, 90);
+
+            doc.addPage();
+
+            // timedAverageGraph
+
+            doc.setFont("Helvetica", "");
+            doc.text("Time based average glucose.", 14, 11.5);
+            doc.rect(14, 15, 180, 100, 'S')
+
+            const timedAverageGraph = renderGraphToImage(createTimedAverageGraph(
+                ["0:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+                past30DaysResult.results.groups.bcFourHourAvg,
+                minBloodSugar,
+                maxBloodSugar
+            ));
+
+            doc.addImage((timedAverageGraph), "PNG", 20, 20, 170, 90);
+
+            doc.setFont("Helvetica", "");
+            doc.text("Raw data.", 14, 126.5);
 
             const body = past30DaysResult.diary.map(entry => {
                 const dateTime = new Temporal.PlainDateTime.from(entry.timestamp);
@@ -111,11 +172,11 @@ export default {
                 headStyles: {
                     fillColor: '#ef4d5a'
                 },
-                startY: 150
+                startY: 130
             })
 
-            // doc.save();
-            // return;
+            doc.save();
+            return;
 
             const fileData = doc.output("datauristring");
             const date = Temporal.Now.plainDateISO().toLocaleString('en-gb', {
