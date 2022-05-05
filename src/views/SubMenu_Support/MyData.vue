@@ -39,7 +39,7 @@ export default {
             const diary = JSON.parse(window.localStorage.getItem("app_diary"));
 
             // Test Data // Comment out or remove in production.
-            generateFakeDiary(100);
+            // generateFakeDiary(100);
 
             // analytic data.
 
@@ -175,8 +175,8 @@ export default {
                 startY: 130
             })
 
-            doc.save();
-            return;
+            // doc.save();
+            // return;
 
             const fileData = doc.output("datauristring");
             const date = Temporal.Now.plainDateISO().toLocaleString('en-gb', {
