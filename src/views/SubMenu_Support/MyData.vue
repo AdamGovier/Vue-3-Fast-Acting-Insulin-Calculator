@@ -5,7 +5,7 @@
         </PannelHeader>
 
         <BtnSecondary @click="exportPDF();">
-            <div style="width: 100%; display: flex; justify-content: space-between;">
+            <div style="width: 100%; display: flex; justify-content: space-around; align-items: center;">
                 <p>Create Report</p>
                 <div>
                     <p v-if="!showLoader">(PDF)</p>
@@ -15,10 +15,10 @@
         </BtnSecondary>
 
         <BtnSecondary @click="saveJSON();">
-            <div style="width: 100%; display: flex; justify-content: space-between;">
-                <p>Export Raw</p>
+            <div style="width: 100%; display: flex; justify-content: space-around; align-items: center;">
+                <p style="margin: 10px;">Export Raw</p>
                 <div>
-                    <p v-if="!jsonLoader">(JSON)</p>
+                    <p style="margin: 10px;" v-if="!jsonLoader">(JSON)</p>
                     <Loader v-if="jsonLoader" />
                 </div>
             </div>
@@ -26,11 +26,11 @@
     </section>
 </template>
 
-<style>
+<style scoped>
     .loader {
-        margin: 0 10px;
-        height: 20px;
-        width: 20px;
+        margin: 0;
+        height: 30px;
+        width: 30px;
     }
 </style>
 

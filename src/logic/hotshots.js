@@ -23,7 +23,7 @@ exports.openFoodFacts = {
 
 exports.local = {
     // Find hotshots from localStorage
-    async findLocalResults(inputType, searchValue) {
+    findLocalResults(inputType, searchValue) {
         const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
         if(!inputType || !searchValue) return hotshots; // If no search value is provided.
 
