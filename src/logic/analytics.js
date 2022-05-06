@@ -37,6 +37,7 @@ export class Analytics {
      * @param Object dateTime, Temporal PlainDateTime object.
      */
     after(dateTime) {
+        if(!dateTime) return this; // Should no date be provided instead of throwing error.
         this.diary = filterDate(this.diary, -1, dateTime);
         return this;
     }
@@ -46,6 +47,7 @@ export class Analytics {
      * @param Object dateTime, Temporal PlainDateTime object.
      */
     before(dateTime) {
+        if(!dateTime) return this; // Should no date be provided instead of throwing error.
         this.diary = filterDate(this.diary, 1, dateTime);
         return this;
     }

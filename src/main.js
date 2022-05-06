@@ -21,7 +21,7 @@ app.config.globalProperties.$author = "Adam Govier";
 app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
 app.config.globalProperties.$tos_version = "1.8";
-app.config.globalProperties.$build_no = "3.0.1"
+app.config.globalProperties.$build_no = "3.1.1"
 
 // Safety constraints.
 

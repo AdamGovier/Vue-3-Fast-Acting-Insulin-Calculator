@@ -5,12 +5,6 @@ exports.openFoodFacts = {
     parseData(data) {
         if(!data.products) { // if no products
             return []; // return empty array
-        } 
-
-        try {
-            /[0-9]g/.test("100g")
-        } catch(e) {
-            console.log(e);
         }
 
         const results = data.products.map(product => { // Get required data
@@ -29,7 +23,7 @@ exports.openFoodFacts = {
 
 exports.local = {
     // Find hotshots from localStorage
-    findLocalResults(inputType, searchValue) {
+    async findLocalResults(inputType, searchValue) {
         const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
         if(!inputType || !searchValue) return hotshots; // If no search value is provided.
 

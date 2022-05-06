@@ -100,6 +100,8 @@ import BtnPrimary from "../../../Buttons/Primary.vue";
 
 import { v4 as uuidv4 } from 'uuid';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 
 export default {
     components: {
@@ -172,13 +174,30 @@ export default {
         },
         async selectOrTakePhoto() {
             try {
-                const image = await Camera.getPhoto({ // https://capacitorjs.com/docs/apis/camera#imageoptions
-                    quality: 90,
+                // https://www.joshmorony.com/using-the-capacitor-filesystem-api-to-store-photos/
+
+                const originalPhoto  = await Camera.getPhoto({ // https://capacitorjs.com/docs/apis/camera#imageoptions
                     allowEditing: false,
                     resultType: CameraResultType.Uri
                 });
 
-                const imageUrl = image.webPath; // get src
+                const photoInTempStorage = await Filesystem.readFile({ path: originalPhoto.path });
+
+                const fileName = uuidv4() + ".jpeg";
+
+                await Filesystem.writeFile({
+                    data: photoInTempStorage.data,
+                    path: fileName,
+                    directory: Directory.Data
+                });
+
+                const finalPhotoUri = await Filesystem.getUri({
+                    directory: Directory.Data,
+                    path: fileName
+                });
+
+                const imageUrl = Capacitor.convertFileSrc(finalPhotoUri.uri); // get web path
+
                 this.$refs.thumb.style.backgroundImage = `url('${imageUrl}')`; // set preview
                 this.values.img = imageUrl; // set image path in the hotshot values.
             } catch (e) {
