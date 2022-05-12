@@ -3,13 +3,14 @@
         <PannelHeader>
             Dose Settings
         </PannelHeader>
-        
-        <div style="width: 90%;">
+
+        <!-- <div style="width: 90%;">
             <Option title="Insulin To Carb Ratio">
                 <InputError :value="errors.carbRatio" v-if="errors.carbRatio" />
                 <InputArea>
                     <Input :value="carbRatio" @new-data="ratio => carbRatio = ratio" type="number" placeholder="8" step="0.1"/>
                     <InputLabel single="true" :value="'(1:' + (carbRatio ? carbRatio : '?') + ')'"/>
+                    <InputButton icon="fas fa-clock" @click="this.panels.correctionFactorCalcPanel = true" />
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
@@ -17,19 +18,27 @@
                     </template>
                     <template v-slot:important>
                         Example: 1:10 meaning 1 unit of insulin per 10 grams of carbohydrates.
+                        <br/> <br/>
+                        Tap the clock to schedule different carb ratios for certain hours of the day.
                     </template>
                 </OptionLabel>
             </Option>
+        </div> -->
 
-            
-            <div class="horizCentre" style="margin-top: 20px;">
-                <BtnPrimary :value="carbRatio ? 'Save' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
-            </div>
+        <DoseDefault v-if="!panels.showScheduler" @showScheduler="panels.showScheduler = true;" />
+
+        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" />
+
+        <div class="horizCentre" style="margin-top: 20px; width: 85%;">
+            <BtnPrimary :value="carbRatio ? 'Save' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
         </div>
     </section>
 </template>
 
 <script>
+import DoseDefault from '../../components/DoseSettings/DoseDefault.vue';
+import DoseScheduled from '../../components/DoseSettings/DoseScheduled.vue';
+
 import Option from '../../components/Options/Option.vue';
 import InputArea from '../../components/Options/InputArea.vue';
 import Input from '../../components/Options/Input.vue';
@@ -51,7 +60,9 @@ export default {
         OptionLabel,
         InputError,
         BtnPrimary,
-        PannelHeader
+        PannelHeader,
+        DoseDefault,
+        DoseScheduled
     },
     updated() {
         this.emitter.emit("exit-without-saving-dialog", true);
@@ -61,6 +72,9 @@ export default {
             carbRatio: window.localStorage.getItem("app_carb_ratio"),
             errors: {
                 carbRatio: null
+            },
+            panels: {
+                showScheduler: false
             }
         }
     },

@@ -5,6 +5,7 @@
             <Option>
                 <InputArea>
                     <InputButton icon="fas fa-minus" @touchstart.prevent="changeCarbohydratesByStep(false)" @touchend="incrementCancel = true" />
+                    <!-- inputmode="decimal" -->
                     <Input :value="values.carbohydrates" @new-data="carbohydrates => values.carbohydrates = parseFloat(carbohydrates)" type="number" placeholder="0" step="0.5"/>
                     <InputLabel single="true" value="Carbohydrates"/>
                     <InputButton icon="fas fa-plus" @touchstart.prevent="changeCarbohydratesByStep(true)" @touchend="incrementCancel = true" />

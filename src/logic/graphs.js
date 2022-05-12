@@ -108,6 +108,8 @@ export function createTimedAverageGraph(times, values, min, max) {
         ]
     */
 
+    values = values.map(value => value ? value.toFixed(1) : undefined);  // So not a massive trailing decimal on graph.
+
     return {
         type: 'bar',
         data: {

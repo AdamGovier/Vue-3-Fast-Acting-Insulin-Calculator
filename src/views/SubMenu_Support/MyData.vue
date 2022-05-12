@@ -111,7 +111,8 @@ export default {
             // All time.
             this.generateReportBlock("All time.", doc, diary, null, now, 15);
 
-            await this.savePDF(doc);
+            doc.save();
+            // await this.savePDF(doc);
         },
 
         async savePDF(doc) {
@@ -214,7 +215,7 @@ export default {
                  .percentageRange({start:minBloodSugar, end:maxBloodSugar}, "bloodGlucose", "inTarget")
                  .percentageRange({start:maxBloodSugar + 0.1}, "bloodGlucose", "high")
                  .percentageRange({end:minBloodSugar - 0.1}, "bloodGlucose", "low")
-                 .fourHourAvg();
+                 .timedAverage("bloodGlucose", 6);
 
             console.log(analyticsResult);
 
@@ -254,7 +255,7 @@ export default {
             if(analyticsResult.results.averages.mean.bloodGlucose < minBloodSugar) doc.setTextColor(139, 0, 0);
 
             doc.setFontSize(20);
-            doc.text(`${analyticsResult.results.averages.mean.bloodGlucose.toFixed(1)} mmol/L`, 87, yAxis);
+            doc.text(`${analyticsResult.results.averages.mean.bloodGlucose ? analyticsResult.results.averages.mean.bloodGlucose.toFixed(1) + " mmol/L" : "N/A mmol/L"}`, 87, yAxis);
 
             yAxis += 10;
             
@@ -263,8 +264,8 @@ export default {
             doc.setFontSize(18);
             doc.setTextColor(0,0,0);
             doc.setFont("Helvetica", "");
-
-            doc.text("Average Blood Glucose Level", 62, yAxis);
+                                                                                                           
+            doc.text(analyticsResult.results.averages.mean.bloodGlucose ? "Average Blood Glucose Level" : "We need more data from you.", 62, yAxis);
 
             // rangeGraph
 
@@ -303,7 +304,7 @@ export default {
 
             const timedAverageGraph = renderGraphToImage(createTimedAverageGraph(
                 ["0:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
-                analyticsResult.results.groups.bcFourHourAvg,
+                analyticsResult.results.groups.timedAverage,
                 minBloodSugar,
                 maxBloodSugar
             ));

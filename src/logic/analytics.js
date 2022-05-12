@@ -85,36 +85,95 @@ export class Analytics {
         return this;
     }
 
-    // Underworks, documentation soon when have full solution.
-    // Ideally will become timesplitAverage(6); for example will split day into 6 parts and work out 6 averages.
-    fourHourAvg() {
-        this.createGroupByDate("bcFourHourAvg", "hour")
+    /**
+     * Get an average for different time periods within the day for a sepcific property.
+     * @param String property, property inside a record to base the average off of. 
+     * @param Number numberOfSlots How many averages you wish to return. For example 64 = splits the 24 hour day into six segments. "0:00" - "04:00", "04:00" - "08:00", "08:00" - "12:00", "12:00" - "16:00", "16:00" - "20:00"
+     */
+    timedAverage(property, numberOfSlots) {
+        const meanAverage = require("mean-average");
 
-        const hours = this.results.groups.bcFourHourAvg;
+        this.createGroupByDate("timedAverage", "hour");
 
-        // Poor solution will come back to later.
-        const divisons = [
-            [...hours[0] || [], ...hours[1] || [], ...hours[2] || [], ...hours[3] || []],
-            [...hours[4] || [], ...hours[5] || [], ...hours[6] || [], ...hours[7] || []],
-            [...hours[8] || [], ...hours[9] || [], ...hours[10] || [], ...hours[11] || []],
-            [...hours[12] || [], ...hours[13] || [], ...hours[14] || [], ...hours[15] || []],
-            [...hours[16] || [], ...hours[17] || [], ...hours[18] || [], ...hours[19] || []],
-            [...hours[20] || [], ...hours[21] || [], ...hours[22] || [], ...hours[23] || []],
-        ];
+        const hours = this.results.groups.timedAverage;
 
-        const property = "bloodGlucose";
+        const NUMBER_OF_HOURS_IN_DAY = 24;
 
-        // 🤮 underworks temp solution!
-        const avgs = [
-            averages.getMean(divisons[0], property).toFixed(1),
-            averages.getMean(divisons[1], property).toFixed(1),
-            averages.getMean(divisons[2], property).toFixed(1),
-            averages.getMean(divisons[3], property).toFixed(1),
-            averages.getMean(divisons[4], property).toFixed(1),
-            averages.getMean(divisons[5], property).toFixed(1)
-        ]
+        const rowsPerTimeSlot = NUMBER_OF_HOURS_IN_DAY / numberOfSlots;
 
-        this.results.groups.bcFourHourAvg = avgs;
+        let previousLoopIndex = 1;
+
+        let averages = [];
+        for (let i = 1; i < numberOfSlots + 1; i++) {
+            const loopUntil = i * rowsPerTimeSlot;
+            let row = [];
+    
+            // +1 as for loop starts at 1 rather than 0. This fixes the first element being multiplied by zero.
+            for (let j = previousLoopIndex; j < loopUntil + 1; j++) {
+                if(hours[j]) row.push(
+                    hours[j]?.map(entry => {
+                            return parseFloat(entry[property]);
+                        }).filter(value => value)
+                );
+            }
+    
+            row = row.flat();
+
+            averages.push(meanAverage(row) || undefined); // else if NaN
+    
+            previousLoopIndex = loopUntil;
+        }
+
+        // console.log(averages);
+
+        this.results.groups.timedAverage = averages;
+
+        // // Poor solution will come back to later.
+        // const divisons = [
+        //     [...hours[0] || [], ...hours[1] || [], ...hours[2] || [], ...hours[3] || []],
+        //     [...hours[4] || [], ...hours[5] || [], ...hours[6] || [], ...hours[7] || []],
+        //     [...hours[8] || [], ...hours[9] || [], ...hours[10] || [], ...hours[11] || []],
+        //     [...hours[12] || [], ...hours[13] || [], ...hours[14] || [], ...hours[15] || []],
+        //     [...hours[16] || [], ...hours[17] || [], ...hours[18] || [], ...hours[19] || []],
+        //     [...hours[20] || [], ...hours[21] || [], ...hours[22] || [], ...hours[23] || []],
+        // ];
+
+        // const property = "bloodGlucose";
+
+        // // 🤮 underworks temp solution!
+        // const avgs = [
+        //     averages.getMean(divisons[0], property).toFixed(1),
+        //     averages.getMean(divisons[1], property).toFixed(1),
+        //     averages.getMean(divisons[2], property).toFixed(1),
+        //     averages.getMean(divisons[3], property).toFixed(1),
+        //     averages.getMean(divisons[4], property).toFixed(1),
+        //     averages.getMean(divisons[5], property).toFixed(1)
+        // ]
+
+        // // console.log("old algo: ", avgs);
+
+        // const divison = 6;
+        // console.log(JSON.stringify(hours));
+
+        // // let timeSlotsRaw = [];
+        // // for (let i = 0; i < divison; i++) {
+        // //     let timeSlotRaw = [];
+        // //     for (let j = 0; j < (24 / divison); j++) {
+        // //         console.log(hours);
+        // //         const entriesOfHour = hours[j];
+        // //         if(entriesOfHour) {
+        // //             timeSlotRaw.push(entriesOfHour);
+        // //         }
+        // //     }           
+        // //     // console.log(timeSlotRaw.flat(1));
+        // //     // console.log(averages.getMean(timeSlotRaw.flat(1), property).toFixed(1));
+        // //     timeSlotsRaw.push(
+        // //         averages.getMean(timeSlotRaw.flat(1), property).toFixed(1)
+        // //     );
+        // // }
+        // // console.log("new algo: ", timeSlotsRaw);
+
+        // this.results.groups.bcFourHourAvg = avgs;
 
         return this;
     }
