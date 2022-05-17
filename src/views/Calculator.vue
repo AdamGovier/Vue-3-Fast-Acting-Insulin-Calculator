@@ -89,6 +89,7 @@
     import { calculate } from "../logic/calculator";
     import { load } from '../logic/secureLoad';
     import { addEntry } from '../logic/diary';
+    import secureStorage from "../logic/secureStorage";
 
     export default {
         components: {
@@ -121,7 +122,7 @@
                     units: "0.00", // String on purpose so I can do zeros after zeros.,
                     carbohydrates: 0,
                     bloodGlucose: 0,
-                    bloodSystem: window.localStorage.getItem("app_blood_sugar_unit")              
+                    bloodSystem: secureStorage.retrieve.bloodSugarUnit()              
                 },
                 errors: {
                     carbohydrates: ""
@@ -144,7 +145,7 @@
                 if(this.values.carbohydrates >= this.$safety.carbohydratesGuidance.max) 
                     this.errors.carbohydrates = "This seems like a large number of carbohydrates, are you sure this is correct?";
 
-                if(this.values.bloodGlucose && this.values.bloodGlucose < load('app_minimum_blood_sugar') && !window.localStorage.getItem('app_warning_hypo_never_show'))
+                if(this.values.bloodGlucose && this.values.bloodGlucose < secureStorage.retrieve.minBlood() && !window.localStorage.getItem('app_warning_hypo_never_show'))
                     this.panels.warning = true;
 
                 const selectedModifiers = this.modifiers.filter(modifier => modifier.checked);
@@ -161,7 +162,7 @@
                     bloodGlucose: this.values.bloodGlucose,
                     units: this.values.units,
                     modifiers: selectedModifiers,
-                    ratio: window.localStorage.getItem("app_carb_ratio")
+                    ratio: secureStorage.retrieve.carbRatio()
                 });
             },
             /**

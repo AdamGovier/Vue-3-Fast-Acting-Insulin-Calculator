@@ -4,7 +4,7 @@
             Dose Settings
         </PannelHeader>
 
-        <!-- <div style="width: 90%;">
+        <div style="width: 90%;">
             <Option title="Insulin To Carb Ratio">
                 <InputError :value="errors.carbRatio" v-if="errors.carbRatio" />
                 <InputArea>
@@ -23,11 +23,11 @@
                     </template>
                 </OptionLabel>
             </Option>
-        </div> -->
-
+        </div>
+<!-- 
         <DoseDefault v-if="!panels.showScheduler" @showScheduler="panels.showScheduler = true;" />
 
-        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" />
+        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" /> -->
 
         <div class="horizCentre" style="margin-top: 20px; width: 85%;">
             <BtnPrimary :value="carbRatio ? 'Save' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
@@ -50,6 +50,8 @@ import InputError from '../../components/Options/InputError.vue';
 import BtnPrimary from '../../components/Buttons/Primary.vue';
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 
+import secureStorage from "../../logic/secureStorage";
+
 export default {
     components: {
         Option,
@@ -69,7 +71,7 @@ export default {
     },
     data() {
         return {
-            carbRatio: window.localStorage.getItem("app_carb_ratio"),
+            carbRatio: secureStorage.retrieve.carbRatio(true),
             errors: {
                 carbRatio: null
             },
@@ -83,16 +85,14 @@ export default {
             const storage = window.localStorage;
 
             //Safety Checks
-            let error = false;
 
             if(this.carbRatio <= this.$safety.carbRatio.min || this.carbRatio >= this.$safety.carbRatio.max) {
                 this.errors.carbRatio = "* Value is not within the expected range.";
-                error = true;
+                return;
             }
 
-            if(error) return;
-
-            storage.setItem("app_carb_ratio", this.carbRatio);
+            // write value to storage and handle a rejection to write data. // this should not be rejected as it should be validated above.
+            if(!secureStorage.write.carbRatio(this.carbRatio)) return this.errors.carbRatio = "* Unknown error."; 
 
             if(!storage.getItem('app_launched_before')) {
                 this.emitter.emit("override-navigation", {path:'/settings/DoseSettings', icon:"return"});

@@ -51,6 +51,8 @@ import BtnSecondary from '../../components/Buttons/Secondary.vue';
 import Loader from "../../components/Other/Loader.vue";
 import OptionsLabel from "../../components/Options/OptionLabel.vue";
 
+import secureStorage from "../../logic/secureStorage";
+
 export default {
     components: {
         PannelHeader,
@@ -156,10 +158,10 @@ export default {
             const data = JSON.stringify({
                 config: {
                     app_correction_factor: storage.getItem("app_correction_factor"),
-                    app_maximum_blood_sugar: storage.getItem("app_maximum_blood_sugar"),
-                    app_carb_ratio: storage.getItem("app_carb_ratio"),
-                    app_blood_sugar_unit: storage.getItem("app_blood_sugar_unit"),
-                    app_minimum_blood_sugar: storage.getItem("app_minimum_blood_sugar"),
+                    app_carb_ratio: secureStorage.retrieve.carbRatio(),
+                    app_blood_sugar_unit: secureStorage.retrieve.bloodSugarUnit(),
+                    app_maximum_blood_sugar: secureStorage.retrieve.maxBlood(),
+                    app_minimum_blood_sugar: secureStorage.retrieve.minBlood(),
                     app_target_blood_sugar: storage.getItem("app_target_blood_sugar")
                 },
                 data: {
@@ -204,8 +206,8 @@ export default {
         generateReportBlock(name, doc, diary, startDate, endDate, yAxis) {
             const analytics = new Analytics(diary);
 
-            const minBloodSugar = parseFloat(window.localStorage.getItem("app_minimum_blood_sugar"));
-            const maxBloodSugar = parseFloat(window.localStorage.getItem("app_maximum_blood_sugar"));
+            const minBloodSugar = secureStorage.retrieve.minBlood();
+            const maxBloodSugar = secureStorage.retrieve.maxBlood();
 
             // get required analytics.
             const analyticsResult = analytics

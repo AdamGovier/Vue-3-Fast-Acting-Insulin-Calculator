@@ -1,4 +1,5 @@
-import {load} from './secureLoad';
+import secureStorage from "./secureStorage";
+import {load} from "./secureLoad";
 
 /**
  * Returns the recomended doseage based on provided parameters.
@@ -46,7 +47,7 @@ const handleModifiers = (modifiers, dose) => {
     /**
      * Checks if the value "carbRatio" is stored within the app's local storage. Just incase of data corruption or something similar.
      */
-    const carbRatio = load("app_carb_ratio");
+    const carbRatio = secureStorage.retrieve.carbRatio();
     // checkValue(carbRatio, "carbRatio");
 
     /**
@@ -65,11 +66,9 @@ const handleModifiers = (modifiers, dose) => {
  * @param {Number} bloodSugar 
  */
 const bloodSugarDoseCalc = (bloodGlucose) => {
-    const storage = window.localStorage;
-
     // These are very long variable names however I think it is important that they are clear on what they store.
-    const minimumBloodGlucoseBeforeDoseDecrease = load('app_minimum_blood_sugar');
-    const maximumBloodGlucoseBeforeDoseIncrease = load('app_maximum_blood_sugar');
+    const minimumBloodGlucoseBeforeDoseDecrease = secureStorage.retrieve.minBlood();
+    const maximumBloodGlucoseBeforeDoseIncrease = secureStorage.retrieve.maxBlood();
 
     const targetBloodSugar = load('app_target_blood_sugar');
     const correctionFactor = load('app_correction_factor');

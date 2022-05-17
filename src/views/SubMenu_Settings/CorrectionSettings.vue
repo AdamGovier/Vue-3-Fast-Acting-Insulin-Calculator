@@ -104,6 +104,8 @@ import Panel from '../../components/Panels/Panel.vue';
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import CorrectionFactorPanel from '../../components/Panels/CorrectionSettings/correctionFactorPanel.vue';
 
+import secureStorage from "../../logic/secureStorage";
+
 export default {
     components: {
         Option,
@@ -125,10 +127,10 @@ export default {
                 correctionFactorCalcPanel: false
             },
             values: {
-                bloodSugarUnit: window.localStorage.getItem('app_blood_sugar_unit') ? window.localStorage.getItem('app_blood_sugar_unit') : "mmol/L",
+                bloodSugarUnit: secureStorage.retrieve.bloodSugarUnit(true) || "mmol/L",
                 correctionFactor: window.localStorage.getItem('app_correction_factor'),
-                minimumBloodSugar: window.localStorage.getItem('app_minimum_blood_sugar'),
-                maximumBloodSugar: window.localStorage.getItem('app_maximum_blood_sugar'),
+                minimumBloodSugar: secureStorage.retrieve.minBlood(true),
+                maximumBloodSugar: secureStorage.retrieve.maxBlood(true),
                 targetBloodSugar: window.localStorage.getItem('app_target_blood_sugar')
             },
             errors: {
@@ -170,10 +172,17 @@ export default {
             if(!error) {
                 const storage = window.localStorage;
 
-                storage.setItem('app_blood_sugar_unit', this.values.bloodSugarUnit);
+                // Save values and handle rejections.
+                if(!secureStorage.write.bloodSugarUnit(this.values.bloodSugarUnit)) 
+                    return this.errors.conversionMessage = "* Unknown error.";
+
+                if(!secureStorage.write.minBlood(parseFloat(this.values.minimumBloodSugar)))
+                    return this.errors.minimumBloodSugar = "* Unknown error.";
+
+                if(!secureStorage.write.maxBlood(parseFloat(this.values.maximumBloodSugar)))
+                    return this.errors.maximumBloodSugar = "* Unknown error.";
+
                 storage.setItem('app_correction_factor', parseFloat(this.values.correctionFactor));
-                storage.setItem('app_minimum_blood_sugar', parseFloat(this.values.minimumBloodSugar));
-                storage.setItem('app_maximum_blood_sugar', parseFloat(this.values.maximumBloodSugar));
                 storage.setItem('app_target_blood_sugar', parseFloat(this.values.targetBloodSugar));
 
                 // Disable ActionBar override.

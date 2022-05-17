@@ -13,13 +13,15 @@
 </template>
 
 <script>
+import secureStorage from "../../logic/secureStorage";
+
 export default {
     props: ['entry'],
     data() {
         return {
-            bloodSugarUnit: window.localStorage.getItem('app_blood_sugar_unit'),
-            minBlood: window.localStorage.getItem("app_minimum_blood_sugar"),
-            maxBlood: window.localStorage.getItem("app_maximum_blood_sugar")
+            bloodSugarUnit: secureStorage.retrieve.bloodSugarUnit(),
+            minBlood: secureStorage.retrieve.minBlood(),
+            maxBlood: secureStorage.retrieve.maxBlood()
         }
     },
     computed: {
