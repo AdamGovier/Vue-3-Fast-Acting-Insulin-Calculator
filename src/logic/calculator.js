@@ -70,8 +70,8 @@ const bloodSugarDoseCalc = (bloodGlucose) => {
     const minimumBloodGlucoseBeforeDoseDecrease = secureStorage.retrieve.minBlood();
     const maximumBloodGlucoseBeforeDoseIncrease = secureStorage.retrieve.maxBlood();
 
-    const targetBloodSugar = load('app_target_blood_sugar');
-    const correctionFactor = load('app_correction_factor');
+    const targetBloodSugar = secureStorage.retrieve.targetBloodSugar();
+    const correctionFactor = secureStorage.retrieve.correctionFactor();
 
     if(bloodGlucose < minimumBloodGlucoseBeforeDoseDecrease || bloodGlucose > maximumBloodGlucoseBeforeDoseIncrease) {
         /**

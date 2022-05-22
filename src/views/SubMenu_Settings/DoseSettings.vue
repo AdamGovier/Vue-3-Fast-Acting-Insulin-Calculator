@@ -4,7 +4,7 @@
             Dose Settings
         </PannelHeader>
 
-        <div style="width: 90%;">
+        <!-- <div style="width: 90%;">
             <Option title="Insulin To Carb Ratio">
                 <InputError :value="errors.carbRatio" v-if="errors.carbRatio" />
                 <InputArea>
@@ -23,11 +23,10 @@
                     </template>
                 </OptionLabel>
             </Option>
-        </div>
-<!-- 
+        </div> -->
         <DoseDefault v-if="!panels.showScheduler" @showScheduler="panels.showScheduler = true;" />
 
-        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" /> -->
+        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" />
 
         <div class="horizCentre" style="margin-top: 20px; width: 85%;">
             <BtnPrimary :value="carbRatio ? 'Save' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
@@ -76,7 +75,7 @@ export default {
                 carbRatio: null
             },
             panels: {
-                showScheduler: false
+                showScheduler: true
             }
         }
     },

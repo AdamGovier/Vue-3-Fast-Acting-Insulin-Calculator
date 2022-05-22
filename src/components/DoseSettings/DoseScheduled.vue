@@ -14,13 +14,13 @@
             </OptionLabel>
         </Option>
 
-        <ButtonSecondary style="width: 90%;">
+        <ButtonSecondary style="width: 90%;" @click="panels.schedulerPanel = true;">
             Add a timed carb ratio.
         </ButtonSecondary>
 
         <transition name="slide">
-            <Panel>
-                <SchedulerPanel/>
+            <Panel v-if="panels.schedulerPanel">
+                <SchedulerPanel @close="panels.schedulerPanel = false;" />
             </Panel>
         </transition>
     </div>
@@ -37,7 +37,7 @@ import InputError from '../Options/InputError.vue';
 import ButtonSecondary from '../Buttons/Secondary.vue';
 
 import Panel from '../Panels/Panel.vue';
-import SchedulerPanel from '../Panels/DoseSettings/Scheduler.vue';
+import SchedulerPanel from '../Panels/DoseSettings/DoseScheduler.vue';
 
 export default {
     components: {
@@ -51,6 +51,13 @@ export default {
         ButtonSecondary,
         Panel,
         SchedulerPanel
-    }
+    },
+    data() {
+        return {
+            panels: {
+                schedulerPanel: true
+            }
+        }
+    },
 }
 </script>

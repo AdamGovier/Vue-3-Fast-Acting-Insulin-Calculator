@@ -12,9 +12,8 @@
             <Option title="Insulin To Carb Ratio">
                 <InputError />
                 <InputArea>
-                    <Input placeholder="8" step="0.1"/>
+                    <Input placeholder="8" type="number" @new-data="ratio => carbRatio = ratio" step="0.1"/>
                     <InputLabel single="true" :value="'(1:' + '?' + ')'"/>
-                    <InputButton icon="fas fa-clock" @click="this.$emit('showScheduler')" />
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
@@ -31,11 +30,11 @@
 
             <Option title="Active Between">
                 <div class="timeBetweenContainer">
-                    <input type="time" id="appt" name="appt"
-                    min="09:00" max="18:00" required>
+                    <input type="time" @input="timeStart = $event.target.value" required>
+
                     <span>-</span>
-                    <input type="time" id="appt" name="appt"
-                    min="09:00" max="18:00" required>
+
+                    <input type="time" @input="timeEnd = $event.target.value" required>
                 </div>
             </Option>
         </div>
@@ -43,7 +42,7 @@
 
         <!-- Spacer -->
         <div style="margin-top: 60px;"></div>
-        <ButtonPrimary value="Save" />
+        <ButtonPrimary value="Save" @click="addScheduledRatio()" />
     </section>
 </template>
 
@@ -86,6 +85,8 @@ import OptionLabel from "../../Options/OptionLabel.vue";
 
 import ButtonPrimary from "../../Buttons/Primary.vue";
 
+import secureStorage from "../../../logic/secureStorage.js"
+
 export default {
     components: {
         MenuItem,
@@ -98,6 +99,26 @@ export default {
         OptionLabel,
         InputArea,
         ButtonPrimary
-    }
+    },
+    data() {
+        return {
+            // new Temporal.PlainTime.from("00:00");
+            timeStart: undefined,
+            timeEnd: undefined,
+            
+            carbRatio: undefined
+        }
+    },
+    methods: {
+        addScheduledRatio() {
+            if(!secureStorage.write.carbRatioScheduled({
+                carbRatio:this.carbRatio,
+                timeStart: this.timeStart,
+                timeEnd: this.timeEnd
+            })) return;
+
+            this.$emit('close');
+        }
+    },
 }
 </script>

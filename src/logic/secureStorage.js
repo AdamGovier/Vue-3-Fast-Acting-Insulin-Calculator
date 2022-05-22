@@ -8,6 +8,9 @@ import app from "@/main";
 import carbRatio from "./secureStorage/carbRatio.js";
 import bloodSugarUnit from "./secureStorage/bloodSugarUnit.js";
 import minMaxBlood from "./secureStorage/minMaxBlood.js";
+import targetBloodSugar from "./secureStorage/targetBloodSugar.js";
+import correctionFactor from "./secureStorage/correctionFactor.js";
+import carbRatioScheduled from "./secureStorage/carbRatioScheduled.js";
 
 export default {
     retrieve: {
@@ -18,7 +21,10 @@ export default {
         },
         maxBlood: (allowUndefined) => {
             return minMaxBlood.retrieve("max", allowUndefined);
-        }
+        },
+        targetBloodSugar: targetBloodSugar.retrieve,
+        correctionFactor: correctionFactor.retrieve,
+        carbRatioScheduled: carbRatioScheduled.retrieve
     },
     write: {
         carbRatio: carbRatio.write,
@@ -28,7 +34,10 @@ export default {
         },
         maxBlood: (value) => {
             return minMaxBlood.write("max", value);
-        }
+        },
+        targetBloodSugar: targetBloodSugar.write,
+        correctionFactor: correctionFactor.write,
+        carbRatioScheduled: carbRatioScheduled.write
     }
 }
 

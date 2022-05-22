@@ -128,10 +128,10 @@ export default {
             },
             values: {
                 bloodSugarUnit: secureStorage.retrieve.bloodSugarUnit(true) || "mmol/L",
-                correctionFactor: window.localStorage.getItem('app_correction_factor'),
+                correctionFactor: secureStorage.retrieve.correctionFactor(true),
                 minimumBloodSugar: secureStorage.retrieve.minBlood(true),
                 maximumBloodSugar: secureStorage.retrieve.maxBlood(true),
-                targetBloodSugar: window.localStorage.getItem('app_target_blood_sugar')
+                targetBloodSugar: secureStorage.retrieve.targetBloodSugar(true)
             },
             errors: {
                 conversionMessage: "",
@@ -172,7 +172,7 @@ export default {
             if(!error) {
                 const storage = window.localStorage;
 
-                // Save values and handle rejections.
+                // Save values and handle rejections (rejections should all be handled above but as a fail safe).
                 if(!secureStorage.write.bloodSugarUnit(this.values.bloodSugarUnit)) 
                     return this.errors.conversionMessage = "* Unknown error.";
 
@@ -182,8 +182,11 @@ export default {
                 if(!secureStorage.write.maxBlood(parseFloat(this.values.maximumBloodSugar)))
                     return this.errors.maximumBloodSugar = "* Unknown error.";
 
-                storage.setItem('app_correction_factor', parseFloat(this.values.correctionFactor));
-                storage.setItem('app_target_blood_sugar', parseFloat(this.values.targetBloodSugar));
+                if(!secureStorage.write.targetBloodSugar(parseFloat(this.values.targetBloodSugar)))
+                    return this.errors.targetBloodSugar = "* Unknown error.";    
+
+                if(!secureStorage.write.correctionFactor(parseFloat(this.values.correctionFactor)))
+                    return this.errors.correctionFactor = "* Unknown error.";  
 
                 // Disable ActionBar override.
                 if(!storage.getItem('app_launched_before')) {

@@ -1,28 +1,29 @@
+
 import validate from "./validate.js";
 import {utils} from "../secureStorage";
 
 const localStorage = window.localStorage;
 
 export default {
-    retrieve(minMax, allowUndefined) {
-        const minMaxBlood = localStorage.getItem(`app_${minMax}imum_blood_sugar`);
-        
-        if(!validate(`${minMax}imumBloodSugar`, minMaxBlood, {
+    retrieve(allowUndefined) {
+        const targetBloodSugar = localStorage.getItem('app_target_blood_sugar');
+
+        if(!validate("targetBloodSugar", targetBloodSugar, {
             withinRange: true,
             number: true,
             allowUndefined
         })) return utils.emitDataReset();
 
-        return parseFloat(minMaxBlood);
+        return parseFloat(targetBloodSugar);
     },
-    write(minMax, value) {
-        if(!validate(`${minMax}imumBloodSugar`, value, {
+    write(value) {
+        if(!validate("targetBloodSugar", value, {
             withinRange: true,
             number: true,
             allowUndefined: false
         })) return false;
-
-        localStorage.setItem(`app_${minMax}imum_blood_sugar`, value);
+        
+        localStorage.setItem(`app_target_blood_sugar`, value);
         return true;
     }
 }

@@ -157,12 +157,12 @@ export default {
 
             const data = JSON.stringify({
                 config: {
-                    app_correction_factor: storage.getItem("app_correction_factor"),
+                    app_correction_factor: secureStorage.retrieve.correctionFactor(),
                     app_carb_ratio: secureStorage.retrieve.carbRatio(),
                     app_blood_sugar_unit: secureStorage.retrieve.bloodSugarUnit(),
                     app_maximum_blood_sugar: secureStorage.retrieve.maxBlood(),
                     app_minimum_blood_sugar: secureStorage.retrieve.minBlood(),
-                    app_target_blood_sugar: storage.getItem("app_target_blood_sugar")
+                    app_target_blood_sugar: secureStorage.retrieve.targetBloodSugar()
                 },
                 data: {
                     app_diary: storage.getItem("app_diary") ? JSON.parse(storage.getItem("app_diary")): [],
