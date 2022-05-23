@@ -55,7 +55,7 @@ export default {
     data() {
         return {
             panels: {
-                schedulerPanel: true
+                schedulerPanel: false
             }
         }
     },

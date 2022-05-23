@@ -9,14 +9,28 @@ export default {
 
     },
     write(value) {
-        console.log(value);
         if(!validate("carbRatio", value.carbRatio, {
             withinRange: true,
             number: true,
             allowUndefined: false
-        })) return false;
+        })) return {status: false, msg: "Invalid value provided.", target: "carbRatio"};
 
-        if(!value.timeStart || !value.timeEnd) return false;
+        if(!value.timeStart || !value.timeEnd) 
+            return {status: false, msg: "Missing value(s).", target: "time"};
+
+        let timeStart,timeEnd;
+
+        // Valid Times
+        try {
+            timeStart = new Temporal.PlainTime.from(value.timeStart);
+            timeEnd = new Temporal.PlainTime.from(value.timeEnd);
+        } catch (error) {
+            return {status: false, msg: "Invalid times provided.", target: "time"};
+        }
+
+        // timeStart must come after timeEnd.
+        if(Temporal.PlainTime.compare(timeStart,timeEnd) !== -1) 
+            return {status: false, msg: "The end time provided does not occur after the first time provided.", target: "time"};
 
         let carbRatioArrayJSON = localStorage.getItem("app_scheduled_carb_ratio");
         if(!carbRatioArrayJSON) carbRatioArrayJSON = "[]"; // If empty, set it to an empty json array.
@@ -28,13 +42,35 @@ export default {
         } catch (error) {
             // Not valid JSON most likely due to corruption or bneing tampered with.
             utils.emitDataReset();
-            return false;
+
+            // Not entirely needed.
+            return {status: false, msg: "Fatal error in application storage.", target: "carbRatio"};;
+        }
+
+        const overlappingTimeFiltered = carbRatioArray.filter(ratioEntry => {
+            const providedTimeRange = [convertTimeToNumber(value.timeStart), convertTimeToNumber(value.timeEnd)];
+            const entryTimeRange = [convertTimeToNumber(ratioEntry.timeStart), convertTimeToNumber(ratioEntry.timeEnd)];
+
+            // b >= c && a <= d // https://stackoverflow.com/questions/36011227/javascript-check-if-time-ranges-overlap
+            if(providedTimeRange[1] >= entryTimeRange[0] && providedTimeRange[0] <= entryTimeRange[1]) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        if(overlappingTimeFiltered.length) return {status: false, msg: "The time range provided overlaps another scheduled carb ratio.", target: "time"}
+
+        function convertTimeToNumber(time) {
+            const hours = Number(time.split(':')[0]);
+            const minutes = Number(time.split(':')[1]) / 60;
+            return hours + minutes;
         }
 
         carbRatioArray.push({...value, uuidv4: uuidv4()});
         localStorage.setItem("app_scheduled_carb_ratio", JSON.stringify(carbRatioArray));
 
-        return true;
+        return {status: true};
     }
 }
 

@@ -10,10 +10,10 @@
 
         <div style="width: 90%;">
             <Option title="Insulin To Carb Ratio">
-                <InputError />
+                <InputError :value="errors.carbRatio"/>
                 <InputArea>
                     <Input placeholder="8" type="number" @new-data="ratio => carbRatio = ratio" step="0.1"/>
-                    <InputLabel single="true" :value="'(1:' + '?' + ')'"/>
+                    <InputLabel single="true" :value="`(1:${carbRatio || '?'})`"/>
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
@@ -29,6 +29,7 @@
             <div style="margin-top: 40px;"></div>
 
             <Option title="Active Between">
+                <InputError :value="errors.time"/>
                 <div class="timeBetweenContainer">
                     <input type="time" @input="timeStart = $event.target.value" required>
 
@@ -105,17 +106,28 @@ export default {
             // new Temporal.PlainTime.from("00:00");
             timeStart: undefined,
             timeEnd: undefined,
-            
-            carbRatio: undefined
+            carbRatio: undefined,
+            errors: {
+                carbRatio: undefined,
+                time: undefined
+            }
         }
     },
     methods: {
         addScheduledRatio() {
-            if(!secureStorage.write.carbRatioScheduled({
+            // Reset error messages.
+            this.errors = {
+                carbRatio: undefined,
+                time: undefined
+            }
+
+            const storageWriteResult = secureStorage.write.carbRatioScheduled({
                 carbRatio:this.carbRatio,
                 timeStart: this.timeStart,
                 timeEnd: this.timeEnd
-            })) return;
+            });
+
+            if(!storageWriteResult.status) return this.errors[storageWriteResult.target] = storageWriteResult.msg;
 
             this.$emit('close');
         }
