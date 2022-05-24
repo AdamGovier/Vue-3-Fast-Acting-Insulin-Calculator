@@ -1,8 +1,8 @@
 <template>
     <section class="horizCentre">
-        <div @click="this.$emit('close')" style="width: 100%;"> 
+        <div @click="closeWindow()" style="width: 100%;"> 
             <!-- Can't attach click event to the MenuItem directly. -->
-            <MenuItem title="Cancel" icon="far fa-trash-alt" slimline="true" /> 
+            <MenuItem :title="editID ? 'Delete' : 'Cancel'" icon="far fa-trash-alt" slimline="true" /> 
         </div>
         <PannelHeader>
             Carb Ratio Scheduler
@@ -12,7 +12,7 @@
             <Option title="Insulin To Carb Ratio">
                 <InputError :value="errors.carbRatio"/>
                 <InputArea>
-                    <Input placeholder="8" type="number" @new-data="ratio => carbRatio = ratio" step="0.1"/>
+                    <Input placeholder="8" :value="carbRatio" type="number" @new-data="ratio => carbRatio = ratio" step="0.1"/>
                     <InputLabel single="true" :value="`(1:${carbRatio || '?'})`"/>
                 </InputArea>
                 <OptionLabel>
@@ -31,11 +31,11 @@
             <Option title="Active Between">
                 <InputError :value="errors.time"/>
                 <div class="timeBetweenContainer">
-                    <input type="time" @input="timeStart = $event.target.value" required>
+                    <input type="time" :value="timeStart" @input="timeStart = $event.target.value" required>
 
                     <span>-</span>
 
-                    <input type="time" @input="timeEnd = $event.target.value" required>
+                    <input type="time" :value="timeEnd" @input="timeEnd = $event.target.value" required>
                 </div>
             </Option>
         </div>
@@ -101,6 +101,7 @@ export default {
         InputArea,
         ButtonPrimary
     },
+    props: ['editID'],
     data() {
         return {
             // new Temporal.PlainTime.from("00:00");
@@ -121,7 +122,10 @@ export default {
                 time: undefined
             }
 
-            const storageWriteResult = secureStorage.write.carbRatioScheduled({
+            // If edited delete then resave.
+            if(this.editID) secureStorage.delete.carbRatioScheduled(this.editID);
+
+            const storageWriteResult = secureStorage.add.carbRatioScheduled({
                 carbRatio:this.carbRatio,
                 timeStart: this.timeStart,
                 timeEnd: this.timeEnd
@@ -130,7 +134,21 @@ export default {
             if(!storageWriteResult.status) return this.errors[storageWriteResult.target] = storageWriteResult.msg;
 
             this.$emit('close');
+        },
+        closeWindow() {
+            if(!this.editID) return this.$emit('close');
+
+            secureStorage.delete.carbRatioScheduled(this.editID);
+            this.$emit('close');
         }
     },
+    mounted() {
+        if(this.editID === null) return;
+        
+        const editData = secureStorage.get.carbRatioScheduled(this.editID);
+        this.carbRatio = editData.carbRatio;
+        this.timeStart = editData.timeStart;
+        this.timeEnd = editData.timeEnd;
+    }
 }
 </script>

@@ -37,7 +37,15 @@ export default {
         },
         targetBloodSugar: targetBloodSugar.write,
         correctionFactor: correctionFactor.write,
-        carbRatioScheduled: carbRatioScheduled.write
+    },
+    add: {
+        carbRatioScheduled: carbRatioScheduled.add
+    },
+    get: {
+        carbRatioScheduled: carbRatioScheduled.get
+    },
+    delete: {
+        carbRatioScheduled: carbRatioScheduled.delete
     }
 }
 

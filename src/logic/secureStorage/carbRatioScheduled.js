@@ -5,10 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 const localStorage = window.localStorage;
 
 export default {
-    retrieve(allowUndefined) {
-
+    retrieve() {
+        return getAllCarbRatios();
     },
-    write(value) {
+    add(value) {
         if(!validate("carbRatio", value.carbRatio, {
             withinRange: true,
             number: true,
@@ -71,6 +71,31 @@ export default {
         localStorage.setItem("app_scheduled_carb_ratio", JSON.stringify(carbRatioArray));
 
         return {status: true};
+    },
+    get(id) {
+        const allEntries = getAllCarbRatios();
+        return allEntries.filter(entry => entry.uuidv4 === id)[0];
+    },
+    delete(id) {
+        const allEntries = getAllCarbRatios();
+        const newArray = allEntries.filter(entry => entry.uuidv4 !== id);
+        localStorage.setItem("app_scheduled_carb_ratio", JSON.stringify(newArray));
+        return true;
     }
 }
 
+function getAllCarbRatios() {
+    let carbRatioArrayJSON = localStorage.getItem("app_scheduled_carb_ratio");
+    if(!carbRatioArrayJSON) carbRatioArrayJSON = "[]"; // If empty, set it to an empty json array.
+
+    let carbRatioArray;
+
+    try {
+        carbRatioArray = JSON.parse(carbRatioArrayJSON);
+    } catch (error) {
+        // Not valid JSON most likely due to corruption or bneing tampered with.
+        return utils.emitDataReset();
+    }
+
+    return carbRatioArray;
+}

@@ -29,7 +29,6 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 90%;
 
     font-size: 18px;
     text-overflow: ellipsis;

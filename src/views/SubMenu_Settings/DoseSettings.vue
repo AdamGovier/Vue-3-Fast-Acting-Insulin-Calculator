@@ -29,7 +29,7 @@
         <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" />
 
         <div class="horizCentre" style="margin-top: 20px; width: 85%;">
-            <BtnPrimary :value="carbRatio ? 'Save' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
+            <BtnPrimary :value="carbRatio ? 'Save Default' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
         </div>
     </section>
 </template>
