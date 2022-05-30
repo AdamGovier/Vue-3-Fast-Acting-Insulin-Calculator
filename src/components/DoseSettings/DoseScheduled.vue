@@ -3,9 +3,9 @@
         <Option title="Insulin To Carb Ratio (Default)">
             <InputError />
             <InputArea>
-                <Input placeholder="8" step="0.1"/>
-                <InputLabel single="true" :value="'(1:' + '?' + ')'"/>
-                <InputButton icon="fas fa-clock" @click="this.$emit('showScheduler')" />
+                <Input :value="carbRatio" @new-data="ratio => {carbRatio = ratio; this.$emit('updateCarbRatio', ratio)}" type="number" placeholder="8" step="0.1"/>
+                <InputLabel single="true" :value="'(1:' + (carbRatio || '?') + ')'"/>
+                <InputButton icon="fas fa-clock" @click="resetSchedule();" />
             </InputArea>
             <OptionLabel>
                 <template v-slot:content>
@@ -104,6 +104,7 @@ export default {
                 schedulerPanel: false,
             },
             editScheduled: null,
+            carbRatio: secureStorage.retrieve.carbRatio(true),
             scheduled: secureStorage.retrieve.carbRatioScheduled()
         }
     },
@@ -112,6 +113,15 @@ export default {
             this.panels.schedulerPanel = false; 
             this.editScheduled = null;
             this.scheduled = secureStorage.retrieve.carbRatioScheduled();
+        },
+        resetSchedule() { 
+            if(this.scheduled.length > 0) {
+                const confirmed = window.confirm("By reverting to a singular carb ratio, you will remove all scheduled ones, are you sure?");
+                if(!confirmed) return;
+                secureStorage.reset.carbRatioScheduled();
+            }
+
+            this.$emit('hideScheduler');
         }
     }
 }

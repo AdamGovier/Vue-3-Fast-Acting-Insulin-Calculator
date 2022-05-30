@@ -3,8 +3,8 @@
             <Option title="Insulin To Carb Ratio">
                 <InputError />
                 <InputArea>
-                    <Input placeholder="8" step="0.1"/>
-                    <InputLabel single="true" :value="'(1:' + '?' + ')'"/>
+                <Input :value="carbRatio" @new-data="ratio => {carbRatio = ratio; this.$emit('updateCarbRatio', ratio)}" type="number" placeholder="8" step="0.1"/>
+                <InputLabel single="true" :value="'(1:' + (carbRatio || '?') + ')'"/>
                     <InputButton icon="fas fa-clock" @click="this.$emit('showScheduler')" />
                 </InputArea>
                 <OptionLabel>
@@ -30,6 +30,8 @@ import InputButton from '../Options/InputButton.vue';
 import OptionLabel from '../Options/OptionLabel.vue';
 import InputError from '../Options/InputError.vue';
 
+import secureStorage from '../../logic/secureStorage.js';
+
 export default {
     components: {
         Option,
@@ -39,6 +41,11 @@ export default {
         InputButton,
         OptionLabel,
         InputError
-    }
+    },
+    data() {
+        return {
+            carbRatio: secureStorage.retrieve.carbRatio(true)
+        }
+    },
 }
 </script>

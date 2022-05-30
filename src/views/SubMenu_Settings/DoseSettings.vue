@@ -24,9 +24,9 @@
                 </OptionLabel>
             </Option>
         </div> -->
-        <DoseDefault v-if="!panels.showScheduler" @showScheduler="panels.showScheduler = true;" />
+        <DoseDefault @updateCarbRatio="carbRatio => this.carbRatio = carbRatio" v-if="!panels.showScheduler" @showScheduler="panels.showScheduler = true;" />
 
-        <DoseScheduled v-if="panels.showScheduler" @showScheduler="panels.showScheduler = false;" />
+        <DoseScheduled @updateCarbRatio="carbRatio => this.carbRatio = carbRatio" v-if="panels.showScheduler" @hideScheduler="panels.showScheduler = false;" />
 
         <div class="horizCentre" style="margin-top: 20px; width: 85%;">
             <BtnPrimary :value="carbRatio ? 'Save Default' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
@@ -75,7 +75,7 @@ export default {
                 carbRatio: null
             },
             panels: {
-                showScheduler: true
+                showScheduler: secureStorage.retrieve.carbRatioScheduled().length
             }
         }
     },

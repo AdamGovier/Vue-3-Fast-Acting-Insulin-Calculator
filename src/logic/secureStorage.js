@@ -46,6 +46,9 @@ export default {
     },
     delete: {
         carbRatioScheduled: carbRatioScheduled.delete
+    },
+    reset: {
+        carbRatioScheduled: carbRatioScheduled.reset
     }
 }
 
