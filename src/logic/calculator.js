@@ -1,4 +1,5 @@
 import secureStorage from "./secureStorage";
+import {currentCarbRatio} from "./scheduledCarbRatio";
 import {load} from "./secureLoad";
 
 /**
@@ -47,7 +48,8 @@ const handleModifiers = (modifiers, dose) => {
     /**
      * Checks if the value "carbRatio" is stored within the app's local storage. Just incase of data corruption or something similar.
      */
-    const carbRatio = secureStorage.retrieve.carbRatio();
+    const carbRatio = currentCarbRatio();
+    console.log(carbRatio);
     // checkValue(carbRatio, "carbRatio");
 
     /**

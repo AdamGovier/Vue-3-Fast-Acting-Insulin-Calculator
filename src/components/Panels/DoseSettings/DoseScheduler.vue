@@ -145,6 +145,8 @@ export default {
     mounted() {
         if(this.editID === null) return;
         
+        // Set inputs to data of that scheduled element.
+        
         const editData = secureStorage.get.carbRatioScheduled(this.editID);
         this.carbRatio = editData.carbRatio;
         this.timeStart = editData.timeStart;

@@ -9,6 +9,10 @@
             
             <p class="output">
                 <table>
+                    <tr>
+                        <td>Current Carb Ratio</td>
+                        <td>{{ carbRatio }}</td>
+                    </tr>
                     <tr v-for="(value, key) in localStorage" >
                         <td>{{key}}</td>
                         <td>{{value}}</td>
@@ -21,6 +25,7 @@
 </template>
 
 <script>
+import { currentCarbRatio } from "../../logic/scheduledCarbRatio";
 const storage = window.localStorage;
 
 export default {
@@ -29,14 +34,19 @@ export default {
             buildNo: this.$build_no,
             showFull: false,
             localStorage: storage,
+            carbRatio: undefined,
             time: Temporal.Now.plainDateTimeISO().toString()
         }
+    },
+    updated() { // On open / close
+        this.carbRatio = currentCarbRatio();
+        this.localStorage = storage;
     },
     mounted() {
         setInterval(() => {
             this.time = Temporal.Now.plainDateTimeISO().toString();
-        }, 100);
-    }
+        }, 100)
+    },
 }
 </script>
 
