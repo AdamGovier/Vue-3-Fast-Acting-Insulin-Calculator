@@ -12,7 +12,7 @@ export function getModifiers() {
         }
 
         modifier.today = isModifierToday(modifier); // Check if the modifier is scheduled for today.
-        modifier.checked = isModifierScheduledNow(modifier); // If modifier is scheduled now, make it checked (Selected).
+        modifier.checked = isModifierScheduledNow(modifier) && isModifierToday(modifier); // If modifier is scheduled now, make it checked (Selected).
 
         return modifier;
     });
