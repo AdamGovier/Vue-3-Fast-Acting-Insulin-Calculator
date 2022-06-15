@@ -196,10 +196,10 @@ export default {
                     path: fileName
                 });
 
-                const imageUrl = Capacitor.convertFileSrc(finalPhotoUri.uri); // get web path
+                const imageUri = finalPhotoUri.uri;
 
-                this.$refs.thumb.style.backgroundImage = `url('${imageUrl}')`; // set preview
-                this.values.img = imageUrl; // set image path in the hotshot values.
+                this.$refs.thumb.style.backgroundImage = `url('${Capacitor.convertFileSrc(imageUri)}')`; // set preview // get web path
+                this.values.img = imageUri; // set image path in the hotshot values.
             } catch (e) {
                 // User most likely has exited camera app.
             }

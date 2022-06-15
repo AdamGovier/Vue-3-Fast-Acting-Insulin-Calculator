@@ -1,3 +1,4 @@
+const { Capacitor } = require('@capacitor/core');
 const storage = window.localStorage;
 
 exports.openFoodFacts = {
@@ -24,7 +25,11 @@ exports.openFoodFacts = {
 exports.local = {
     // Find hotshots from localStorage
     findLocalResults(inputType, searchValue) {
-        const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
+        const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots"))
+        .map(hotshot => {
+            hotshot.img = Capacitor.convertFileSrc(hotshot.img);
+            return hotshot;
+        }) : [];
         if(!inputType || !searchValue) return hotshots; // If no search value is provided.
 
         switch (inputType) {

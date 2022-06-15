@@ -50,24 +50,6 @@ export default {
 
         if(rangeOverlapOthers(value, carbRatioArray)) return {status: false, msg: "The time range provided overlaps another scheduled carb ratio.", target: "time"}
 
-        // const overlappingTimeFiltered = carbRatioArray.filter(ratioEntry => {
-        //     const providedTimeRange = [convertTimeToNumber(value.timeStart), convertTimeToNumber(value.timeEnd)];
-        //     const entryTimeRange = [convertTimeToNumber(ratioEntry.timeStart), convertTimeToNumber(ratioEntry.timeEnd)];
-
-        //     // e.g. a: 13:00 b: 04:00. Then 04:00 is the next day so add 24 hour to correct the calculation.
-        //     if(providedTimeRange[1] < providedTimeRange[0]) providedTimeRange[1] += 24;
-        //     if(entryTimeRange[1] < entryTimeRange[0]) entryTimeRange[1] += 24;
-
-        //     // b >= c && a <= d // https://stackoverflow.com/questions/36011227/javascript-check-if-time-ranges-overlap
-        //     if(providedTimeRange[1] >= entryTimeRange[0] && providedTimeRange[0] <= entryTimeRange[1]) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        // });
-
-        // if(overlappingTimeFiltered.length) return {status: false, msg: "The time range provided overlaps another scheduled carb ratio.", target: "time"}
-
         carbRatioArray.push({...value, uuidv4: uuidv4()});
         localStorage.setItem("app_scheduled_carb_ratio", JSON.stringify(carbRatioArray));
 
