@@ -1,4 +1,5 @@
 const { Capacitor } = require('@capacitor/core');
+const { Filesystem, Directory, Encoding } = require('@capacitor/filesystem');
 const storage = window.localStorage;
 
 exports.openFoodFacts = {
@@ -24,14 +25,28 @@ exports.openFoodFacts = {
 
 exports.local = {
     // Find hotshots from localStorage
-    findLocalResults(inputType, searchValue) {
-        const hotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots"))
-        .map(hotshot => {
-            hotshot.img = Capacitor.convertFileSrc(hotshot.img);
+    async findLocalResults(inputType, searchValue) {
+        const rawHotshots = storage.getItem("app_local_hotshots") ? JSON.parse(storage.getItem("app_local_hotshots")) : [];
+
+        // Create a map to return webpath of images.
+        const hotshotPromises = rawHotshots.map(async hotshot => {
+            if(!hotshot.img) return hotshot;
+
+            const photo = await Filesystem.getUri({
+                directory: Directory.Data,
+                path: hotshot.img
+            });
+
+            hotshot.img = Capacitor.convertFileSrc(photo.uri);
             return hotshot;
-        }) : [];
+        })
+
+        // Run all the promises to return parsed hotshot.
+        const hotshots = await Promise.all(hotshotPromises);
+
         if(!inputType || !searchValue) return hotshots; // If no search value is provided.
 
+        // Search type.
         switch (inputType) {
             case "barcode":
                 return searchByBarcode(hotshots, searchValue);

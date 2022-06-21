@@ -8,7 +8,6 @@
             <i class="far fa-images"></i>
         </div>
         
-        
         <div style="width: 95%; margin-top: 20px;">
             <Option title="Hotshot Name">
                 <InputArea>
@@ -191,15 +190,14 @@ export default {
                     directory: Directory.Data
                 });
 
-                const finalPhotoUri = await Filesystem.getUri({
-                    directory: Directory.Data,
-                    path: fileName
-                });
+                // This needs to be done on image viewing rather than saving. // the latter results in the filepath changing on iOS after recompile.
+                // const finalPhotoUri = await Filesystem.getUri({
+                //     directory: Directory.Data,
+                //     path: fileName
+                // });
 
-                const imageUri = finalPhotoUri.uri;
-
-                this.$refs.thumb.style.backgroundImage = `url('${Capacitor.convertFileSrc(imageUri)}')`; // set preview // get web path
-                this.values.img = imageUri; // set image path in the hotshot values.
+                this.$refs.thumb.style.backgroundImage = `url('${originalPhoto.webPath}')`; // set preview // get web path
+                this.values.img = fileName; // set filename in the hotshot values.
             } catch (e) {
                 // User most likely has exited camera app.
             }

@@ -325,7 +325,7 @@ export default {
         async getResults(source, inputType, searchValue) {
             switch (source) {
                 case "local":
-                    return hotshots.local.findLocalResults(inputType, searchValue);
+                    return await hotshots.local.findLocalResults(inputType, searchValue);
                     break;
 
                 case "bolus_calculator_api":
