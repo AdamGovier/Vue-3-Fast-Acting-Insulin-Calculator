@@ -98,6 +98,8 @@ import InputError from "../../../Options/InputError.vue";
 import BtnPrimary from "../../../Buttons/Primary.vue";
 
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
+
 import { Camera, CameraResultType } from '@capacitor/camera';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
@@ -120,7 +122,8 @@ export default {
                 name: null,
                 carbohydrates: null,
                 weight: null,
-                img: null
+                img: null,
+                imageWebPath: null
             },
             errors: {
                 hotshotName: null,
@@ -135,7 +138,7 @@ export default {
         this.values.weight = this.hotshot.weight;
     },
     methods: {
-        save() {
+        async save() {
             this.errors = {}; // clear errors.
             if(!this.values.name) return this.errors.hotshotName = "You must specify a hotshot name.";
             if(!this.values.carbohydrates) return this.errors.carbohydrates = "You must specify an amount of carbohydrates.";
@@ -160,6 +163,25 @@ export default {
 
             storage.setItem("app_local_hotshots", JSON.stringify(hotshots));
             this.$emit('close');
+
+            // If editing do not reupload to server.
+            if(this.hotshot) return;
+
+            const body = new FormData();
+            body.append('name', this.values.name);
+            body.append('carbohydrates', this.values.carbohydrates);
+            body.append('weight', this.values.weight);
+            if(this.values.barcode) body.append('barcode', this.values.barcode);
+            if(this.values.imageWebPath) {
+                const blob = await fetch(this.values.imageWebPath).then(r => r.blob());
+                body.append('image', blob, "upload.jpg");``
+            }
+
+            axios.post(`${this.$endpoint}api/hotshots/create`, body, {
+                headers: {
+                    'content-type': 'multipart/form-data'
+                }
+            });
         },
         deleteHotshot() {
             const confirm = window.confirm("Are you sure you want to delete this hotshot?");
@@ -179,6 +201,8 @@ export default {
                     allowEditing: false,
                     resultType: CameraResultType.Uri
                 });
+
+                this.values.imageWebPath = originalPhoto.webPath;
 
                 const photoInTempStorage = await Filesystem.readFile({ path: originalPhoto.path });
 

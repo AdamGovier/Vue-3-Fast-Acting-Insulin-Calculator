@@ -365,9 +365,16 @@ export default {
 
                 try {
                     const response = 
-                        await axios.get(`http://localhost:3000/api/hotshots/get/${inputType}/${searchValue}`);
+                        await axios.get(`${this.$endpoint}api/hotshots/get/${inputType}/${searchValue}`);
 
-                    return response.data ?? [];
+                    // set thumbnail url
+                    const hotshots = response.data.map(entry => {
+                        entry.img = `${this.$endpoint}api/hotshots/thumbnail/${entry.imagePath}`; 
+                        return entry;
+                    });
+                    
+                     // if undefined return empty array.
+                    return hotshots ?? [];
                 } catch (error) {
                     this.handleAxiosError(error, "bolus_calculator_api");
                     return [];

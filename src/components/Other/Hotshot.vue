@@ -4,7 +4,7 @@
             <p v-if="!hotshot.selected">{{ hotshot.carbs }}g of Carbs</p>
             <p v-if="hotshot.selected">{{ roundPointFive(hotshot.carbs * hotshot.selected)}}g {{ hotshot.selected }}x</p>
         </div>
-        <div class="thumbnail" :style="`background-image: url('${hotshot.img ? hotshot.img : 'https://content.storefront7.co.za/common/images/no-image.png'}');`">
+        <div class="thumbnail" :style="`background-image: url('${hotshot.img ?? 'https://content.storefront7.co.za/common/images/no-image.png'}');`">
             <span style="border-radius: 0 5px 0 0;">{{ hotshot.name }}</span>
             <span style="border-radius: 5px 0 0 0;">{{ hotshot.weight }}g</span>
         </div>
