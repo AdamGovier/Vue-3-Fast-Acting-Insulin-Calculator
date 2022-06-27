@@ -44,16 +44,13 @@
                 </OptionLabel>
             </Option>
 
-            <Option title="Barcode" v-if="barcode">
+            <Option title="Barcode" v-if="values.barcode">
                 <InputArea>
-                    <Input :value="barcode" @new-data="barcodeNum => barcode = barcodeNum" type="number" placeholder="0"/>
+                    <Input :value="values.barcode" @new-data="barcodeNum => values.barcode = barcodeNum" type="text" :disabled="true" />
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
-                        Allow this item to be selected by scanning this barcode number.
-                    </template>
-                    <template v-slot:important>
-                        This field is optional.
+                        Allows this item to be selected by scanning this barcode number.
                     </template>
                 </OptionLabel>
             </Option>
@@ -123,7 +120,8 @@ export default {
                 carbohydrates: null,
                 weight: null,
                 img: null,
-                imageWebPath: null
+                imageWebPath: null,
+                barcode: null
             },
             errors: {
                 hotshotName: null,
@@ -132,12 +130,28 @@ export default {
         }
     },
     mounted() {
+        if(this.barcode) this.values.barcode = barcode;
         if(!this.hotshot) return;
         this.values.name = this.hotshot.name;
         this.values.carbohydrates = this.hotshot.carbs;
         this.values.weight = this.hotshot.weight;
+        if(this.hotshot.barcode) this.values.barcode = this.hotshot.barcode;
+        if(this.hotshot.imgFilename) {
+            this.loadPreviousPhoto(this.hotshot.imgFilename);
+        }
     },
     methods: {
+        // If editing hotshot load preview
+        async loadPreviousPhoto(img) {
+            const photo = await Filesystem.getUri({
+                directory: Directory.Data,
+                path: img
+            });
+
+            this.values.img = img;
+            this.values.imageWebPath = Capacitor.convertFileSrc(photo.uri);
+            this.$refs.thumb.style.backgroundImage = `url('${this.values.imageWebPath}')`;
+        },
         async save() {
             this.errors = {}; // clear errors.
             if(!this.values.name) return this.errors.hotshotName = "You must specify a hotshot name.";
@@ -158,7 +172,7 @@ export default {
                 carbs: this.values.carbohydrates,
                 weight: this.values.weight,
                 img: this.values.img,
-                barcode: this.barcode
+                barcode: this.values.barcode
             });
 
             storage.setItem("app_local_hotshots", JSON.stringify(hotshots));

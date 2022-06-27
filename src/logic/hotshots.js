@@ -37,7 +37,9 @@ exports.local = {
                 path: hotshot.img
             });
 
+            hotshot.imgFilename = hotshot.img; // For the hotshot manager to have access to the filename.
             hotshot.img = Capacitor.convertFileSrc(photo.uri);
+            
             return hotshot;
         })
 
