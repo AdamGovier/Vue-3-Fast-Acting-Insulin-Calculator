@@ -130,12 +130,20 @@ export default {
         }
     },
     mounted() {
-        if(this.barcode) this.values.barcode = barcode;
+        // barcode provided from barcode scanner
+        if(this.barcode) this.values.barcode = this.barcode;
+
+        // If not in edit mode.
         if(!this.hotshot) return;
+
+        // barcode provided from edit action.
+        if(this.hotshot.barcode) this.values.barcode = this.hotshot.barcode;
+
         this.values.name = this.hotshot.name;
         this.values.carbohydrates = this.hotshot.carbs;
         this.values.weight = this.hotshot.weight;
-        if(this.hotshot.barcode) this.values.barcode = this.hotshot.barcode;
+
+        // Render preview photo.
         if(this.hotshot.imgFilename) {
             this.loadPreviousPhoto(this.hotshot.imgFilename);
         }

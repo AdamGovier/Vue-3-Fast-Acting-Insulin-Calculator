@@ -41,10 +41,10 @@ exports.local = {
             hotshot.img = Capacitor.convertFileSrc(photo.uri);
             
             return hotshot;
-        })
+        });
 
-        // Run all the promises to return parsed hotshot.
-        const hotshots = await Promise.all(hotshotPromises);
+        // Run all the promises to return parsed hotshot. // reverse to show recently created / modified hotshots.
+        const hotshots = (await Promise.all(hotshotPromises)).reverse();
 
         if(!inputType || !searchValue) return hotshots; // If no search value is provided.
 

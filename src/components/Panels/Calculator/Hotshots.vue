@@ -46,7 +46,7 @@
             <div class="hotshotGrid">
                 <!-- Render hotshots from localstorage -->
                 <div v-for="hotshot in results.local">
-                    <!-- Add 1 if already exists otherwise set to 1 -->
+                    <!-- @add Add 1 to the selected count otherwise init at 1. -->
                     <Hotshot
                         @edit="hotshotToEdit => {editHotshot = hotshotToEdit; panels.manager = true;}"
                         @add="hotshot => {
@@ -70,6 +70,7 @@
 
             <!-- Load hotshots from Bolus Calculator API -->
             <div class="hotshotGrid" v-if="results.bolus_calculator_api.length && search.value">
+                <!-- @add Add 1 to the selected count otherwise init at 1. -->
                 <Hotshot 
                     @add="hotshot => {
                         cached.push(hotshot)
@@ -94,6 +95,7 @@
 
             <!-- Load hotshots from Open Food Facts API -->
             <div class="hotshotGrid" v-if="results.open_food_facts.length && search.value">
+                <!-- @add Add 1 to the selected count otherwise init at 1. -->
                 <Hotshot 
                     @add="hotshot => {
                         cached.push(hotshot)
@@ -163,6 +165,11 @@
         grid-template-columns: 48.5% 48.5%;
         row-gap: 20px;
         column-gap: 3%;
+    }
+
+    /* leave gap at bottom for scrol */
+    .hotshotGrid:nth-of-type(3) {
+        padding-bottom: 50px;
     }
 
     .hotshotError {
@@ -271,6 +278,7 @@ export default {
 
             this.results.local = await this.getResults("local", this.search.searchType, this.search.value);
 
+
             if(this.search.value) {
                 this.results.bolus_calculator_api 
                     = await this.getResults("bolus_calculator_api", this.search.searchType, this.search.value);
@@ -282,9 +290,11 @@ export default {
         },
 
         async scanBarcode() {
+            // // Test code to run on desktop without compile.
             // this.search.value = "510010005";
             // this.search.searchType = "barcode";
             // await this.populateHotshots();
+            // return createHotshotPrompt(this);
 
             const status = await BarcodeScanner.checkPermission({ force: true });
 
@@ -306,13 +316,20 @@ export default {
                 this.search.searchType = "barcode";
 
                 await this.populateHotshots();
+                createHotshotPrompt(this);
+            }
 
-                if(this.results.open_food_facts.length || this.results.bolus_calculator_api.length || this.results.local.length) return;
+            /**
+             * @param Object scope, provide it the "this" object from a block higher in the scope which has access to the vue properties.
+             * @description If there are no results for the barcode ask user to create a new hotshot.
+             */
+            function createHotshotPrompt(scope) {
+                if(scope.results.open_food_facts.length || scope.results.bolus_calculator_api.length || scope.results.local.length) return;
 
                 const confirm = window.confirm("There are no products on record for this barcode, would you like to create a hotshot for it?")
                 if(confirm) { // show hotshot creator
-                    this.editHotshot = null; 
-                    this.panels.manager = true; 
+                    scope.editHotshot = null; 
+                    scope.panels.manager = true; 
                 } 
             }
         },
@@ -373,8 +390,8 @@ export default {
                         return entry;
                     });
                     
-                     // if undefined return empty array.
-                    return hotshots ?? [];
+                     // if undefined return empty array. // reverse to show recently created / modified hotshots.
+                    return hotshots.reverse() ?? [];
                 } catch (error) {
                     this.handleAxiosError(error, "bolus_calculator_api");
                     return [];

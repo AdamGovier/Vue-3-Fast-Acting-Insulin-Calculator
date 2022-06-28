@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "compile": "npm run build && npx cap sync",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
