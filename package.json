@@ -38,7 +38,8 @@
     "pdfmake": "^0.2.5",
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "yesno-dialog": "^0.2.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.30",

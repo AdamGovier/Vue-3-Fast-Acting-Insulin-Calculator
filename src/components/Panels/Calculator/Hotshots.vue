@@ -424,8 +424,15 @@ export default {
                     products = {products:[response.data.product]}
                 }
 
-                return hotshots.openFoodFacts.parseData(products);
+                // Parse results into a suitable format for the hotshot component.
+                const results = hotshots.openFoodFacts.parseData(products);
+
+                // If no results
+                if(!results.length) this.noDataReason.open_food_facts = "No results found.";
+
+                return results;
             } catch (error) {
+                console.log(error);
                 this.handleAxiosError(error, "open_food_facts");
                 return [];
             }

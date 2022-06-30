@@ -65,11 +65,29 @@
 
         <h1 style="margin-top: 40px;">Privacy Policy</h1>
         <LegalBlock>
-            <p>This privacy policy was last modified on the 14th of January 2021</p>
+            <p>This privacy policy was last modified on the 30th of June 2022</p>
             <br/>
             <p>
                 <strong>1.1</strong>
-                Adam Govier's Bolus Calc stores data only locally on the users hardware, This version does not store/transfer any data remotely.
+                Adam Govier's Bolus Calculator by default only stores data locally on the users hardware however the user can upload media and nutritional information about food products if the user has chosen to opt in.
+            </p>
+            <br/>
+            <p>
+                <strong>1.2</strong>
+                Adam Govier's Bolus Calculator does not store any personally identifiable information with the exception of the possibility of meta-data (Location tags etc.) stored alongside media content (Images).
+            </p>
+        </LegalBlock>
+
+        <h1 style="margin-top: 40px;">Licensing</h1>
+        <LegalBlock>
+            <p>
+                <strong>Open Food Facts</strong>
+            </p>
+            <br/>
+            <p>
+                The hotshots tab uses "Open Food Facts" as one of it's data sources to retrieve nutritional information & media about food products. 
+                <br/><br/>
+                The data is available under the licence Open Database License and the photos are licensed under the licence Creative Commons Attribution Share-Alike. The brands quoted are the property of their respective owners.
             </p>
         </LegalBlock>
 

@@ -91,10 +91,12 @@ import Input from "../../../Options/Input.vue";
 import InputLabel from "../../../Options/InputLabel.vue";
 import OptionLabel from "../../../Options/OptionLabel.vue";
 import InputError from "../../../Options/InputError.vue";
+import InputCheckboxRadio from "../../../Options/InputCheckboxRadio.vue";
 
 import BtnPrimary from "../../../Buttons/Primary.vue";
 
 import { v4 as uuidv4 } from 'uuid';
+import yesno from "yesno-dialog";
 import axios from 'axios';
 
 import { Camera, CameraResultType } from '@capacitor/camera';
@@ -109,6 +111,7 @@ export default {
         Input,
         InputLabel,
         OptionLabel,
+        InputCheckboxRadio,
         BtnPrimary,
         InputError
     },
@@ -188,6 +191,15 @@ export default {
 
             // If editing do not reupload to server.
             if(this.hotshot) return;
+
+            const shareConfirmed = await yesno({
+                bodyText: "Would you like to share this hotshot with other users?",
+                labelYes: "Sure!",
+                labelNo: "No"
+            });
+            
+            // If user wishes not to share hotshot.
+            if(!shareConfirmed) return;
 
             const body = new FormData();
             body.append('name', this.values.name);

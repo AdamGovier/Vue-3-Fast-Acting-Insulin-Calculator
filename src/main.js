@@ -20,8 +20,8 @@ const app = createApp(App);
 app.config.globalProperties.$author = "Adam Govier";
 app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
-app.config.globalProperties.$tos_version = "1.8";
-app.config.globalProperties.$build_no = "3.1.2"
+app.config.globalProperties.$tos_version = "1.9";
+app.config.globalProperties.$build_no = "3.2.9";
 
 app.config.globalProperties.$endpoint = "http://5.71.44.248:27015/"
 
