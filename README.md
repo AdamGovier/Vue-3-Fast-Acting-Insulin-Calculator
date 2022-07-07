@@ -1,12 +1,10 @@
-
 <center>
     <h1>Bolus-Calculator</h1>
     <img src="https://i.imgur.com/u1ZGUtn.png" alt="drawing" width="100%"  />
-    
+
     Open Source fast acting insulin (Bolus) dosage calculator app.
+
 </center>
-
-
 
 ## Current Status
 
@@ -20,9 +18,7 @@ The application is not ready for general use.
 
 ### Underworks:
 
-* 🏗️ One more feature to be implemented to the base application.
-* 🪲 One or two major bug fixes need to be implemented.
-* 🧪 Unit testing needs to be caried out.
+* 🧪 E2E testing needs to be caried out.
 * 🧑‍🚀 Personal testing (I will test the application on myself).
 * 👪 User testing (An alpha test with a select user-group.).
 
