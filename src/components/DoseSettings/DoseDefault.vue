@@ -3,7 +3,7 @@
             <Option title="Insulin To Carb Ratio">
                 <InputError />
                 <InputArea>
-                <Input :value="carbRatio" @new-data="ratio => {carbRatio = ratio; this.$emit('updateCarbRatio', ratio)}" type="number" placeholder="8" step="0.1"/>
+                <Input testid="unschedCarbRatioInput" :value="carbRatio" @new-data="ratio => {carbRatio = ratio; this.$emit('updateCarbRatio', ratio)}" type="number" placeholder="8" step="0.1"/>
                 <InputLabel single="true" :value="'(1:' + (carbRatio || '?') + ')'"/>
                     <InputButton icon="fas fa-clock" @click="this.$emit('showScheduler')" />
                 </InputArea>

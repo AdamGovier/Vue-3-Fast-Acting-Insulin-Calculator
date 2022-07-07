@@ -32,6 +32,10 @@
         height: 30px;
         width: 30px;
     }
+
+    h1 {
+        margin-block-end: 12.5px;
+    }
 </style>
 
 <script>

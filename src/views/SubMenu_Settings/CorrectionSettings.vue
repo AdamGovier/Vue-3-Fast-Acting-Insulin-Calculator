@@ -23,7 +23,7 @@
             <Option title="Correction Factor">
                 <InputError :value="errors.correctionFactor" v-if="errors.correctionFactor" />
                 <InputArea>
-                    <Input :value="values.correctionFactor" @new-data="correctionFactor => values.correctionFactor = correctionFactor" type="number" placeholder="2.3" step="0.01"/>
+                    <Input testid="CorrectionFactorInput" :value="values.correctionFactor" @new-data="correctionFactor => values.correctionFactor = correctionFactor" type="number" placeholder="2.3" step="0.01"/>
                     <InputLabel :value="values.bloodSugarUnit"/>
                     <InputButton value="?" @click="this.panels.correctionFactorCalcPanel = true" />
                 </InputArea>
@@ -40,7 +40,7 @@
             <Option title="Minimum Blood Sugar">
                 <InputError :value="errors.minimumBloodSugar" v-if="errors.minimumBloodSugar" />
                 <InputArea>
-                    <Input :value="values.minimumBloodSugar" @new-data="minimumBloodSugar => values.minimumBloodSugar = minimumBloodSugar" type="number" placeholder="4.0" step="0.1"/>
+                    <Input testid="MinimumBloodSugarInput" :value="values.minimumBloodSugar" @new-data="minimumBloodSugar => values.minimumBloodSugar = minimumBloodSugar" type="number" placeholder="4.0" step="0.1"/>
                     <InputLabel single="true" :value="values.bloodSugarUnit"/>
                 </InputArea>
                 <OptionLabel>
@@ -53,7 +53,7 @@
             <Option title="Maximum Blood Sugar">
                 <InputError :value="errors.maximumBloodSugar" v-if="errors.maximumBloodSugar" />
                 <InputArea>
-                    <Input :value="values.maximumBloodSugar"  @new-data="maximumBloodSugar => values.maximumBloodSugar = maximumBloodSugar" type="number" placeholder="7.0" step="0.1"/>
+                    <Input testid="MaximumBloodSugarInput" :value="values.maximumBloodSugar"  @new-data="maximumBloodSugar => values.maximumBloodSugar = maximumBloodSugar" type="number" placeholder="7.0" step="0.1"/>
                     <InputLabel single="true" :value="values.bloodSugarUnit"/>
                 </InputArea>
                 <OptionLabel>
@@ -66,7 +66,7 @@
             <Option title="Target Blood Sugar">
                 <InputError :value="errors.targetBloodSugar" v-if="errors.targetBloodSugar" />
                 <InputArea>
-                    <Input :value="values.targetBloodSugar" @new-data="targetBloodSugar => values.targetBloodSugar = targetBloodSugar" type="number" placeholder="5.4" step="0.1"/>
+                    <Input testid="TargetBloodSugarInput" :value="values.targetBloodSugar" @new-data="targetBloodSugar => values.targetBloodSugar = targetBloodSugar" type="number" placeholder="5.4" step="0.1"/>
                     <InputLabel single="true" :value="values.bloodSugarUnit"/>
                 </InputArea>
                 <OptionLabel>
@@ -77,7 +77,7 @@
             </Option>
 
             <div class="horizCentre">
-                <BtnPrimary @click="save();" :value="allRequiredValuesFilled ? 'Save' : 'Missing Values'" :disabled="!allRequiredValuesFilled"/>
+                <BtnPrimary testid="SaveCorrectionSettingsBtn" @click="save();" :value="allRequiredValuesFilled ? 'Save' : 'Missing Values'" :disabled="!allRequiredValuesFilled"/>
             </div>
         </div>
     </section>
@@ -189,9 +189,9 @@ export default {
                     return this.errors.correctionFactor = "* Unknown error.";  
 
                 // Disable ActionBar override.
-                if(!storage.getItem('app_launched_before')) {
+                if(!storage.getItem('app_has_finished_setup')) {
                     this.emitter.emit("override-navigation", {path:null, icon:"normal"});
-                    storage.setItem('app_launched_before', true);
+                    storage.setItem('app_has_finished_setup', true);
                     this.$router.push('/');
                 } else {
                     this.$router.push('/settings');

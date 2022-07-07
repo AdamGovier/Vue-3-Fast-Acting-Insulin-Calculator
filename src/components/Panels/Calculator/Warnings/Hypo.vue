@@ -89,10 +89,10 @@ export default {
                 await LocalNotifications.schedule({
                 notifications: [
                     {
-                        title: "Testing",
-                        body: "1 2",
+                        title: "Hypo Reminder",
+                        body: "Please test your blood glucose levels.",
                         id: 1,
-                        schedule: { at: new Date(Date.now() + 2000) },
+                        schedule: { at: new Date(Date.now() + (15 * 60 * 1000)) }, // 15 mins.
                         actionTypeId: "",
                         extra: null,
                         sound: "alarm.wav",

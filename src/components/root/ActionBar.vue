@@ -1,8 +1,9 @@
 <template>
   <!-- Testing -->
   <p style="display: none;">{{path}}</p> 
+  <!-- Action Bar -->
   <nav>
-    <img @click="handleClick()" :src="iconRendered" id="navLogo">
+    <img data-testid="ActionBar" @click="handleClick()" :src="iconRendered" id="navLogo">
     <!-- <router-link :to="path"> // Moved to programatic navigation instead due to needing a exit without saving handler.
         <img :src="iconRendered" id="navLogo">
     </router-link> -->
@@ -37,7 +38,7 @@ export default {
     methods: {
         handleClick() {
             if(this.exitWithoutSaving) {
-                const confirm = window.confirm("You have made changes, are you sure you want to exit?");
+                const confirm = window.confirm("You have made unsaved changes, are you sure you want to exit?");
                 if(!confirm) return;
             }
 

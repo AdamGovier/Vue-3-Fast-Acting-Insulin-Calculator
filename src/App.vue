@@ -34,7 +34,7 @@ export default {
     const storage = window.localStorage;
 
     // If first launch
-    if(!storage.getItem('app_launched_before')) {
+    if(!storage.getItem('app_has_finished_setup')) {
       this.$router.push('/Welcome');
     } else {
       if(storage.getItem('app_tos_version') < this.$tos_version) {

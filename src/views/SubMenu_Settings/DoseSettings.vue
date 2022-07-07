@@ -29,7 +29,7 @@
         <DoseScheduled @updateCarbRatio="carbRatio => this.carbRatio = carbRatio" v-if="panels.showScheduler" @hideScheduler="panels.showScheduler = false;" />
 
         <div class="horizCentre" style="margin-top: 20px; width: 85%;">
-            <BtnPrimary :value="carbRatio ? 'Save Default' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
+            <BtnPrimary testid="SaveDoseSettingsBtn" :value="carbRatio ? 'Save Default' : 'Missing Values'" :disabled="!carbRatio" @click="saveDose()"/>
         </div>
     </section>
 </template>
@@ -79,6 +79,14 @@ export default {
             }
         }
     },
+    mounted() {
+        const storage = window.localStorage; 
+        
+        // Fix for deep navigation from correction setting on first setup.
+        if(!storage.getItem('app_has_finished_setup')) {
+            this.emitter.emit("override-navigation", {path:'/Welcome', icon:"return"});
+        }
+    },
     methods: {
         saveDose() {
             const storage = window.localStorage;
@@ -93,7 +101,7 @@ export default {
             // write value to storage and handle a rejection to write data. // this should not be rejected as it should be validated above.
             if(!secureStorage.write.carbRatio(this.carbRatio)) return this.errors.carbRatio = "* Unknown error."; 
 
-            if(!storage.getItem('app_launched_before')) {
+            if(!storage.getItem('app_has_finished_setup')) {
                 this.emitter.emit("override-navigation", {path:'/settings/DoseSettings', icon:"return"});
                 this.$router.push('/settings/CorrectionSettings');
             } else {

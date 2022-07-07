@@ -1,10 +1,10 @@
 <template>
-    <input class="inputbox" ref="inputbox" :value="value ? value : ''" @keyup="this.$emit('new-data', this.$refs.inputbox.value);" @change="this.$emit('data-changed', this.$refs.inputbox.value)" :type="type" :placeholder="placeholder" :step="step" :disabled="disabled ?? false">
+    <input :data-testid="testid" class="inputbox" ref="inputbox" :value="value ? value : ''" @keyup="this.$emit('new-data', this.$refs.inputbox.value);" @change="this.$emit('data-changed', this.$refs.inputbox.value)" :type="type" :placeholder="placeholder" :step="step" :disabled="disabled ?? false">
 </template>
 
 <script>
 export default {
-    props: ['type', 'placeholder', 'step', 'value', 'disabled']
+    props: ['type', 'placeholder', 'step', 'value', 'disabled', 'testid']
 }
 </script>
 

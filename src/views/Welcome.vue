@@ -19,7 +19,7 @@
             Not right now but once you have finished setting up, you can edit any of these preferences at any time using the <strong style="color: var(--action-colour);">menu button</strong> on the top of the page (The Logo).
         </p>
 
-        <ButtonPrim value="Next" @click="firstLaunchNext()"/>
+        <ButtonPrim value="Next" testid="WelcomeContinue" @click="firstLaunchNext()"/>
     </section>
 
     <section class="horizCentre" v-if="emergencyReset">

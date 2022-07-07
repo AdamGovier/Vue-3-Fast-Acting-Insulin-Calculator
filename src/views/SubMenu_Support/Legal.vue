@@ -91,8 +91,8 @@
             </p>
         </LegalBlock>
 
-        <ButtonPrim value="Accept" @click="acceptTerms()" v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" />
-        <ButtonPrim :value="`Accepted ${getAcceptedDateString}`" v-else disabled="true" />
+        <ButtonPrim v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" testid="acceptToSBtn" value="Accept" test @click="acceptTerms()" />
+        <ButtonPrim v-else :value="`Accepted ${getAcceptedDateString}`"  disabled="true" />
     </section>
 </template>
 
@@ -123,7 +123,7 @@ export default {
             this.acceptedTosVersion = storage.getItem('app_tos_version');
             this.acceptedDate = new Date(storage.getItem('app_tos_date'));
 
-            if(!storage.getItem('app_launched_before')) {
+            if(!storage.getItem('app_has_finished_setup')) {
                 // If the user has accepted an exits the app for example when they re-open it they will be stuck on this page if it wasn't for this due to the menu button navigating back to the welcome page pre-setup/first launch.
                 this.emitter.emit("override-navigation", {path:'/Welcome', icon:"return"});
                 this.navigateToNextSetup();
@@ -146,7 +146,7 @@ export default {
             storage.setItem("app_tos_version", this.acceptedTosVersion);
             storage.setItem("app_tos_date", this.acceptedDate);
 
-            if(!storage.getItem('app_launched_before')) {
+            if(!storage.getItem('app_has_finished_setup')) {
                 this.emitter.emit("override-navigation", {path:'/support/Legal', icon:"return"});
                 this.navigateToNextSetup();
             } else {

@@ -1,5 +1,5 @@
 <template>
-    <button class="primary" ref="button" :class="{override}">{{ value }}</button>
+    <button class="primary" ref="button" :data-testid="testid" :class="{override}">{{ value }}</button>
 </template>
 
 <style>
@@ -33,7 +33,7 @@
 
 <script>
 export default {
-    props: ['value', 'disabled', 'override'], // Override just makes it a big red scary button :D
+    props: ['value', 'disabled', 'override', 'testid'], // Override just makes it a big red scary button :D
     mounted() {
         this.updateDisabled();
     },
