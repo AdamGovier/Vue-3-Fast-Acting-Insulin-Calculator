@@ -31,9 +31,7 @@ Once the above is finished I plan to continue to add features to the application
 
 ### Why port to Vue 3
 
-I want this project to be the best I can possibly make it. The move over to Vue will allow a more maintainable codebase allowing me to update the app without the need of digging through spaghetti code.
-
-On top of porting over everything to Vue I need to actually finish the project so this will not be finished any time soon.
+Vue 3 allows me to easily maintain a large codebase with splitting the UI and logic into smaller components. This will make the addition of future updates easier aswell as making the project more accessible for other developers wishing to make Bolus Calculator their own.
 
 ## Compiling
 
