@@ -1,6 +1,5 @@
 import secureStorage from "./secureStorage";
 import {currentCarbRatio} from "./scheduledCarbRatio";
-import {load} from "./secureLoad";
 
 /**
  * Returns the recomended doseage based on provided parameters.

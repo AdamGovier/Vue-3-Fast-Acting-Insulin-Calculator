@@ -18,6 +18,9 @@
     --margin: 1.25vh;
     
     --content-height: calc((100vh - var(--actionBarHeight)) - calc(var(--margin) * 2) - env(safe-area-inset-top)); /* Main height perfectly fits by taking the remaining height left from the height of the actionBar and margins */
+
+    --margin-sm: 20px;
+    --margin-lg: 100px;
 }
 
 * {

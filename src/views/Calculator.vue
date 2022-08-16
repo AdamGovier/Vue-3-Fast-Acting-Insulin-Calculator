@@ -87,7 +87,6 @@
 
     import { getModifiers } from "../logic/modifiers";
     import { calculate } from "../logic/calculator";
-    import { load } from '../logic/secureLoad';
     import { addEntry } from '../logic/diary';
     import secureStorage from "../logic/secureStorage";
 

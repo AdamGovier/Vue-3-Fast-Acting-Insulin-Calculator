@@ -211,7 +211,7 @@ export default {
                 body.append('image', blob, "upload.jpg");``
             }
 
-            axios.post(`${this.$endpoint}api/hotshots/create`, body, {
+            axios.post(`${this.$endpoint}/api/hotshots/create`, body, {
                 headers: {
                     'content-type': 'multipart/form-data'
                 }

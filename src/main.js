@@ -4,6 +4,10 @@ import router from './router';
 
 import mitt from 'mitt'; // https://stackoverflow.com/questions/63471824/vue-js-3-event-bus
 
+// API WRAPPERS FOR HOTSHOTS
+import LocalHotshotController from "@/logic/Hotshots/LocalController.js";
+import PublicHotshotController from "@/logic/Hotshots/PublicController.js";
+
 // Camera PWA Elements
 // import { defineCustomElements } from '@ionic/pwa-elements/loader';
 // defineCustomElements(app.config.globalProperties.window);
@@ -20,10 +24,31 @@ const app = createApp(App);
 app.config.globalProperties.$author = "Adam Govier";
 app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
+// App global configurations.
+
 app.config.globalProperties.$tos_version = "1.9";
 app.config.globalProperties.$build_no = "3.2.9";
 
-app.config.globalProperties.$endpoint = "http://5.71.44.248:27015/"
+// Bolus Calculator API Endpoint.
+app.config.globalProperties.$endpoint = "http://151.229.21.85:27015";
+
+app.config.globalProperties.$hotshots = {
+
+    // Add custom APIs to the Hotshots panel.
+    apiWrappers: [
+        {
+            // LocalStorage Hotshots
+            name: "Hotshots",
+            Controller: LocalHotshotController
+        },
+        {
+            // External Bolus Calculator API
+            name: "Bolus Calculator",
+            Controller: PublicHotshotController
+        }
+    ]
+}
+
 
 // Safety constraints.
 
