@@ -1,9 +1,9 @@
 export default class SuperController {
-    constructor(showLoader, blurb, createError) {
+    constructor(showLoader, requireSearch, createMessage) {
         this.selected = [];
         this.showLoader = showLoader;
-        this.blurb = blurb;
-        this.createError = createError;
+        this.createMessage = createMessage;
+        this.requireSearch = requireSearch;
 
         this.filters = {
             searchTerm: null,

@@ -36,6 +36,7 @@
     "mean-average": "^1.0.0",
     "mitt": "^3.0.0",
     "pdfmake": "^0.2.5",
+    "statman-stopwatch": "^2.13.0",
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

@@ -30,6 +30,9 @@
                 :type="wrapper.name" 
 
                 @updateTotal="subTotal => this.totalCarbs += parseFloat(subTotal)" 
+                @processed="barcodeFound => doesBarcodeExist(barcodeFound)"
+                @hotshotEdit="hotshot => {editHotshot = hotshot; panels.hotshotManager = true;}
+                /* ^ ? Show the Hotshot manager with the hotshot requesting to be edited. */"
             />
         </div>
     
@@ -41,6 +44,21 @@
             "
             v-if="panels.barcodeUI" 
         />
+
+        <!-- Create Hotshot footer, clicking on it brings up the Hotshot manger panel. -->
+        <div id="addHotshotFooter">
+            <ButtonSecondary @click="editHotshot = null; panels.hotshotManager = true;">
+                <i class="fas fa-camera"></i>
+                <span>Create a new hotshot</span>
+            </ButtonSecondary>
+        </div>
+
+        <!-- Window to create / edit Hotshots -->
+        <transition name="slide">
+            <Panel v-if="panels.hotshotManager">
+                <HotshotManager :barcode="this.filters.barcode" :hotshot="editHotshot" @close="panels.hotshotManager = false; this.emitter.emit('reload-hotshots', 'Hotshots')" />
+            </Panel>
+        </transition>
     </section>
 </template>
 
@@ -50,6 +68,22 @@
         margin-top: var(--margin-sm); 
         margin-bottom: var(--margin-lg);
     }
+
+    #addHotshotFooter {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left:0;
+    }
+    #addHotshotFooter .secondary {
+        margin: 0;
+        border-radius: 0;
+        width: 100%;
+        padding: 30px 0 ;
+    }
+    #addHotshotFooter .secondary div * {
+        margin: 0 10px;
+    }
 </style>
 
 <script>
@@ -58,6 +92,9 @@ import TopBar from "@/components/Hotshots/TopBar.vue";
 import SearchBar from "@/components/Hotshots/SearchBar.vue";
 import DataContainer from "@/components/Hotshots/DataContainer.vue";
 import BarcodeScannerUI from "@/components/Other/BarcodeScannerUI.vue";
+import HotshotManager from "./Hotshots/Manager.vue";
+import ButtonSecondary from "@/components/Buttons/Secondary.vue";
+import Panel from "@/components/Panels/Panel.vue";
 
 // Modules
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
@@ -67,24 +104,33 @@ export default {
         TopBar,
         SearchBar,
         DataContainer,
-        BarcodeScannerUI
+        BarcodeScannerUI,
+        HotshotManager,
+        ButtonSecondary,
+        Panel
     },
     data() {
         return {
             totalCarbs: 0,
             filters: {
-                searchTerm: null,
-                barcode: null
+                searchTerm: "",
+                barcode: ""
             },
             panels: {
-                barcodeUI: false
-            }
+                barcodeUI: false,
+                hotshotManager: false
+            },
+            editHotshot: null, // Tells the hotshot manger to edit the hotshot provided rather than create a new one.
+            barcodeFound: false, // If false after search it will show a dialog asking if you wish to create a hotshot with that barcode.
+            resultsRetrieved: 0 // To check if the responses recieve matches the amount of API wrappers.
         }
     },
     methods: {
         async scanBarcode() {
-            // Test code to run on desktop without compile.
-            // this.filters.barcode = "510010005";
+            this.filters.searchTerm = null;
+
+            // // Test code to run on desktop without compile.
+            // this.filters.barcode = "30176204221003";
             // return;
 
             const status = await BarcodeScanner.checkPermission({ force: true });
@@ -98,13 +144,33 @@ export default {
 
             // if the result has content
             if (result.hasContent) {
-                this.filters.searchTerm = null;
                 this.filters.barcode = result.content;
             }
 
             // Hide barcode UI, show all other UI.
             this.panels.barcodeUI = false;
             this.emitter.emit('hide-ui', false);
+        },
+        // Do any of the API calls find a product with matching barcode.
+        doesBarcodeExist(found) {
+            this.resultsRetrieved++;
+            if(found) this.barcodeFound = found;
+
+            const expectedResponseCount = this.$hotshots.apiWrappers.length;
+            console.log(expectedResponseCount, this.resultsRetrieved, this.barcodeFound)
+            if(expectedResponseCount !== this.resultsRetrieved) return;
+
+            if(!this.barcodeFound) {
+                this.barcodeFound = false;
+                
+                const confirm = window.confirm("There are no products on record for this barcode, would you like to create a hotshot for it?")
+                if(confirm) {
+                    this.editHotshot = null;
+                    this.panels.hotshotManager = true;
+                }
+            }
+
+            this.resultsRetrieved = 0;
         }
     }
 }

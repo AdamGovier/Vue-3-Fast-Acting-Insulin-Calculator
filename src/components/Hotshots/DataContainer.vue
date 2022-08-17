@@ -1,7 +1,7 @@
 <template>
-<div>
+<div v-if="!this.controller.requireSearch || (this.controller.requireSearch && (this.searchTerm || this.barcode))">
     <h3 style="font-weight: normal;">{{ type }}</h3>
-        <p class="hotshotError">{{ errorDescription }}</p>
+        <p v-if="!searchInProgress" class="hotshotError">{{ errorDescription }}</p>
 
     <!-- Loading Spinner -->
     <Loader v-if="showLoader" />
@@ -14,6 +14,9 @@
              
                 @selectHotshot="selectHotshot(hotshot.id, hotshot.carbs)"
                 @deductHotshot="deductHotshot(hotshot.id, hotshot.carbs)"
+                @edit="hotshot => this.$emit('hotshotEdit', hotshot)"
+
+                :editEnabled="this.controller.editable"
                 :selected="countSelections(hotshot.id)"
             />
         </div>
@@ -50,6 +53,13 @@ export default {
     },
     props: ["type", "Controller", "searchTerm", "barcode"],
     async mounted() {
+        // If hotshots of this API are edited.
+        this.emitter.on("reload-hotshots", async apiType => {  
+            if(apiType !== this.type) return;
+
+            this.results = await this.controller.searchByTerm(this.searchTerm).searchByBarcode(this.barcode).retrieveResults();
+        });
+
         this.results = await this.controller.retrieveResults();
     },
     data() {
@@ -58,10 +68,11 @@ export default {
             total: 0,
             showLoader: false,
             cached: {
-                searchTerm: null,
-                barcode: null
+                searchTerm: "",
+                barcode: ""
             },
-            controller: new this.Controller(this.createError),
+            controller: new this.Controller(this.createMessage),
+            searchInProgress: false,
             errorOverride: null // Change error message from the automatic messages i.e. "No results found." or the category descriptor.
         }
     },
@@ -79,7 +90,13 @@ export default {
     },
     methods: {
         async filterHotshots() {
+            // console.log("keyword:", this.searchTerm,  this.cached.searchTerm,  this.cached.searchTerm == this.searchTerm);
+            // console.log("barcode:", this.barcode,  this.cached.barcode,  this.cached.barcode == this.barcode);
+
             if(this.searchTerm === this.cached.searchTerm && this.barcode === this.cached.barcode) return;
+
+            this.searchInProgress = true;
+            this.errorOverride = false;
 
             // Hide previous results when searching.
             this.results = [];
@@ -87,12 +104,19 @@ export default {
             // Show loader if applicable.
             if(this.controller.showLoader) this.showLoader = true;
 
+            const barcodeSearch = this.cached.barcode !== this.barcode && this.barcode;
+
+
             // Set caches to allow the check for changed search filters.
             this.cached.searchTerm = this.searchTerm;
             this.cached.barcode = this.barcode;
 
             // Execute the search.
             this.results = await this.controller.searchByTerm(this.searchTerm).searchByBarcode(this.barcode).retrieveResults();
+
+            // Search finished.
+            if(barcodeSearch) this.$emit('processed', !!this.results.length);
+            this.searchInProgress = false;
 
             // Hide Loaders
             this.showLoader = false;
@@ -110,7 +134,7 @@ export default {
         countSelections(id) {
             return this.controller.countSelections(id);
         },
-        createError(message) {
+        createMessage(message) {
             this.errorOverride = message;
         }
     }

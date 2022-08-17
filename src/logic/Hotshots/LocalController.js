@@ -10,8 +10,9 @@ import Hotshot from "./Hotshot.js";
 const storage = window.localStorage;
 
 export default class LocalContoller extends SuperController {
-    constructor() {
-        super(true, "Your created hotshots.");
+    constructor(createMessage) {
+        super(true, false, createMessage);
+        this.editable = true;
     }
 
     async retrieveResults() {
@@ -39,15 +40,24 @@ export default class LocalContoller extends SuperController {
         let hotshots = (await Promise.all(hotshotPromises)).reverse();
 
         // Bind to hotshot template.
-        hotshots = hotshots.map(hotshot => new Hotshot(hotshot.id, hotshot.name, hotshot.carbs, hotshot.weight, hotshot.img));
+        hotshots = hotshots.map(hotshot => new Hotshot(hotshot.id, hotshot.name, hotshot.carbs, hotshot.weight, hotshot.img, hotshot.barcode));
 
         // Conditional these functions will return original results if second argument is empty (undefined || null).
         hotshots = searchByTerm(hotshots, this.filters.searchTerm);
         hotshots = searchByBarcode(hotshots, this.filters.barcode);
 
+        // i.e. 1 Result(s)
+        if(hotshots.length) this.createMessage(`${hotshots.length} ${hotshots.length > 1 ? "Results" : "Result"}`);
+        
+        // This might look bizarre but this is more of a physiological feature rather than a practical function. 
+        // I found that when searching for a hotshot this function would show the results so fast my brain instantly would not realise the search
+        // occured at all. So a subtle delay allows a loading spinner to show before the results are presented hinting at the user that a
+        // search has occured. 
+        if(this.filters.searchTerm || this.filters.barcode) await new Promise((resolve, reject) => setTimeout(resolve, 150));
+
         // Clear any search filters for next round of results.
         this.filters = {}; 
-        
+
         return hotshots;
     }
 }
@@ -56,7 +66,6 @@ export default class LocalContoller extends SuperController {
 function searchByBarcode(results, barcode) {
     // If no barcode is provided return original results.
     if(!barcode) return results;
-
     // Find hotshots with field barcode matching provided barcode.
     return results.filter(
         hotshot => hotshot.barcode === barcode

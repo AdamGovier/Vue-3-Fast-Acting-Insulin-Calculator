@@ -6,7 +6,8 @@ import mitt from 'mitt'; // https://stackoverflow.com/questions/63471824/vue-js-
 
 // API WRAPPERS FOR HOTSHOTS
 import LocalHotshotController from "@/logic/Hotshots/LocalController.js";
-import PublicHotshotController from "@/logic/Hotshots/PublicController.js";
+import InHouseHotshotController from "@/logic/Hotshots/InHouseController.js";
+import OpenFoodFactsController from "@/logic/Hotshots/OpenFoodFactsController.js";
 
 // Camera PWA Elements
 // import { defineCustomElements } from '@ionic/pwa-elements/loader';
@@ -27,7 +28,7 @@ app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 // App global configurations.
 
 app.config.globalProperties.$tos_version = "1.9";
-app.config.globalProperties.$build_no = "3.2.9";
+app.config.globalProperties.$build_no = "3.2.10";
 
 // Bolus Calculator API Endpoint.
 app.config.globalProperties.$endpoint = "http://151.229.21.85:27015";
@@ -44,7 +45,12 @@ app.config.globalProperties.$hotshots = {
         {
             // External Bolus Calculator API
             name: "Bolus Calculator",
-            Controller: PublicHotshotController
+            Controller: InHouseHotshotController
+        },
+        {
+            // OpenFoodFacts API
+            name: "Open Food Facts",
+            Controller: OpenFoodFactsController
         }
     ]
 }
