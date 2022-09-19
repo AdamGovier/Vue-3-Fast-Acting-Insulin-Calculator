@@ -1,4 +1,5 @@
 import app from "@/main";
+import secureStorage from "../secureStorage";
 
 export default function validate(property, value, options) {
     let status = true;
@@ -12,8 +13,16 @@ export default function validate(property, value, options) {
 }
 
 function withinRange(value, key) {
+    const bloodSystem = secureStorage.retrieve.bloodSugarUnit();
+
+    const rawMin = app.config.globalProperties.$safety[key].min;
+    const rawMax = app.config.globalProperties.$safety[key].max;
+
+    const min = bloodSystem === "mg/dL" ?  rawMin * 18 : rawMin;
+    const max = bloodSystem === "mg/dL" ?  rawMax * 18 : rawMax;
+
     // if not in range.
-    if(value <= app.config.globalProperties.$safety[key].min || value >= app.config.globalProperties.$safety[key].max)
+    if(value <= min || value >= max)
         return false;
     
     // Passes all checks.

@@ -33,10 +33,13 @@
         </BtnSecondary>
 
         <!-- If modifiers are enabled. -->
-        <div style="width: 40%; margin-top: 20px;" v-if="selectedModiferNames"> 
+        <div style="width: 40%; margin-top: 20px;" v-if="selectedModiferNames || sickDayRules.units"> 
             <p style="text-align: center;">
                 Selected Modifiers:
-                <span style="color: var(--action-colour);">{{ selectedModiferNames }}</span>
+                <span style="color: var(--action-colour);">
+                    <span v-if="sickDayRules.units">Sickness (+ {{sickDayRules.units}} U)<span v-if="selectedModiferNames">,</span></span>    
+                    {{ selectedModiferNames }}
+                </span>
             </p>
         </div>
 
@@ -49,7 +52,7 @@
 
     <transition name="slide">
         <Panel v-if="panels.moreOptions">
-            <MoreOptionsPanel @update="modifierList => modifiers = modifierList" :modifierList="modifiers" @close="panels.moreOptions = false;" />
+            <MoreOptionsPanel @update="modifierList => modifiers = modifierList" @sicknessUpdate="output => sickDayRules = output" :inputSickDayRules="sickDayRules" :modifierList="modifiers" @close="panels.moreOptions = false;" />
         </Panel>
     </transition>
 
@@ -127,7 +130,9 @@
                     carbohydrates: ""
                 },
                 incrementCancel: false,
-                modifiers: getModifiers()
+                modifiers: getModifiers(),
+                // Special modifier adds units rather than a %.
+                sickDayRules: {}
             }
         },
         computed: {
@@ -153,7 +158,8 @@
                 this.values.units = calculate({
                     carbohydrates: this.values.carbohydrates,
                     bloodGlucose: this.values.bloodGlucose,
-                    modifiers: selectedModifiers
+                    modifiers: selectedModifiers,
+                    additionalUnits: parseFloat(this.sickDayRules.units)
                 });
 
                 // Add entry to the diary.
@@ -162,7 +168,8 @@
                     bloodGlucose: this.values.bloodGlucose,
                     units: this.values.units,
                     modifiers: selectedModifiers,
-                    ratio: secureStorage.retrieve.carbRatio()
+                    ratio: secureStorage.retrieve.carbRatio(),
+                    ketones: this.sickDayRules.ketones
                 });
             },
             /**

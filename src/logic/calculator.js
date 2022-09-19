@@ -3,7 +3,7 @@ import {currentCarbRatio} from "./scheduledCarbRatio";
 
 /**
  * Returns the recomended doseage based on provided parameters.
- * @param Object values An object of values including the keys carbohydrates,bloodGlucose and modifiers.
+ * @param Object values An object of values including the keys carbohydrates,bloodGlucose and modifiers, additionalUnits.
  */
 export function calculate(values) {
     let dose = 0; // Variable for keeping track of the total dose.
@@ -11,6 +11,11 @@ export function calculate(values) {
     if(values.carbohydrates) dose += carbs2Insulin(values.carbohydrates);
     if(values.bloodGlucose) dose += bloodSugarDoseCalc(values.bloodGlucose);
     if(values.modifiers.length) dose = handleModifiers(values.modifiers, dose);
+    console.log(values.additionalUnits, dose)
+    // Manually add units. i.e. Sick Day Rules.
+    if(values.additionalUnits) dose += values.additionalUnits;
+    console.log(values.additionalUnits, dose)
+
 
     //round to nearest 0.25;
     dose = (Math.round(dose * 4) / 4).toFixed(2);

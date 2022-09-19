@@ -53,7 +53,7 @@ export default class LocalContoller extends SuperController {
         // I found that when searching for a hotshot this function would show the results so fast my brain instantly would not realise the search
         // occured at all. So a subtle delay allows a loading spinner to show before the results are presented hinting at the user that a
         // search has occured. 
-        if(this.filters.searchTerm || this.filters.barcode) await new Promise((resolve, reject) => setTimeout(resolve, 150));
+        if(this.filters.searchTerm || this.filters.barcode) await new Promise(resolve => setTimeout(resolve, 150));
 
         // Clear any search filters for next round of results.
         this.filters = {}; 

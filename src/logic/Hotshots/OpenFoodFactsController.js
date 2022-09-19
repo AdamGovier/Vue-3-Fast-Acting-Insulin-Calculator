@@ -68,5 +68,7 @@ function getBarcodeUrl(barcode) {
 }
 
 function getSearchTermURL(keyword) {
+    if(!keyword) return;
+
     return `https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${keyword}&search_simple=1&action=process&json=1`;
 }

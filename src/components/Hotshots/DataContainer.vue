@@ -60,7 +60,10 @@ export default {
             this.results = await this.controller.searchByTerm(this.searchTerm).searchByBarcode(this.barcode).retrieveResults();
         });
 
-        this.results = await this.controller.retrieveResults();
+        // if it requires search or not. if it does make sure search term or barcode is present.
+        if(!this.controller.requireSearch || (this.controller.requireSearch && (this.searchTerm || this.barcode))) {
+            this.results = await this.controller.retrieveResults();
+        }
     },
     data() {
         return {
@@ -85,14 +88,11 @@ export default {
         }
     },
     async updated() {
-        // If search term in paticular has changed.
         this.filterHotshots();
     },
     methods: {
         async filterHotshots() {
-            // console.log("keyword:", this.searchTerm,  this.cached.searchTerm,  this.cached.searchTerm == this.searchTerm);
-            // console.log("barcode:", this.barcode,  this.cached.barcode,  this.cached.barcode == this.barcode);
-
+            // Continue if search term in paticular has changed.
             if(this.searchTerm === this.cached.searchTerm && this.barcode === this.cached.barcode) return;
 
             this.searchInProgress = true;

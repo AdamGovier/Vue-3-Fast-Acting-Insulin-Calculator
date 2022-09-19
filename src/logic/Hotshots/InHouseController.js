@@ -36,7 +36,7 @@ export default class PublicController extends SuperController {
 
             return hotshots;
         } catch(error) {
-            if(error.response?.status !== 404) this.createError("An error has occurred, please try again later.");
+            if(error.response?.status !== 404) this.createMessage("An error has occurred, please try again later.");
             return [];
         }
     }
