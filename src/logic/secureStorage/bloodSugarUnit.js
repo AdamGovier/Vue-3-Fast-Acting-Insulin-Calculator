@@ -13,7 +13,6 @@ export default {
         return rawBloodSugarUnit;
     },
     write(value) {
-        console.log(value);
         if(value !== "mmol/L" && value !== "mg/dL") return false;
 
         localStorage.setItem('app_blood_sugar_unit', value);

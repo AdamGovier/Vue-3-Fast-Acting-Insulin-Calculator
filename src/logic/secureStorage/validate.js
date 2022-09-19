@@ -9,11 +9,12 @@ export default function validate(property, value, options) {
 
     // If the value is undefined set the status to true.
     if(options.allowUndefined && (value === undefined || value === null)) status = true;
+
     return status;
 }
 
 function withinRange(value, key) {
-    const bloodSystem = secureStorage.retrieve.bloodSugarUnit();
+    const bloodSystem = secureStorage.retrieve.bloodSugarUnit(true);
 
     const rawMin = app.config.globalProperties.$safety[key].min;
     const rawMax = app.config.globalProperties.$safety[key].max;

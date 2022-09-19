@@ -91,7 +91,7 @@
             </p>
         </LegalBlock>
 
-        <ButtonPrim v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" testid="acceptToSBtn" value="Accept" test @click="acceptTerms()" />
+        <ButtonPrim v-if="!acceptedTOS || acceptedTosVersion < currentTosVersion" testid="acceptToSBtn" value="Accept" @click="acceptTerms()" />
         <ButtonPrim v-else :value="`Accepted ${getAcceptedDateString}`"  disabled="true" />
     </section>
 </template>
