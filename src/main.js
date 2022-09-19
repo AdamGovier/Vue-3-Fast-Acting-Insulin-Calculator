@@ -31,7 +31,7 @@ app.config.globalProperties.$tos_version = "1.9";
 app.config.globalProperties.$build_no = "3.2.10";
 
 // Bolus Calculator API Endpoint.
-app.config.globalProperties.$endpoint = "http://151.229.21.85:27015";
+app.config.globalProperties.$endpoint = "http://90.220.55.219:27015";
 
 app.config.globalProperties.$hotshots = {
 
