@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "compile": "npm run build && npx cap sync",
-    "test:unit": "vue-cli-service test:unit"
+    "test": "npx playwright test",
+    "testDebug": "npx playwright test --debug"
   },
   "dependencies": {
     "@awesome-cordova-plugins/core": "^5.41.0",

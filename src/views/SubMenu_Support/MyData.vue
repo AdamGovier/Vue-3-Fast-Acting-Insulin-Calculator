@@ -49,6 +49,7 @@ import { Share } from '@capacitor/share';
 
 import { Analytics, generateFakeDiary } from '../../logic/analytics';
 import { renderGraphToImage, createRangeGraph, createTimedAverageGraph } from "../../logic/graphs";
+import handleError from "@/logic/log/handleError";
 
 import PannelHeader from '../../components/Panels/Components/PanelHeader.vue';
 import BtnSecondary from '../../components/Buttons/Secondary.vue';
@@ -72,53 +73,59 @@ export default {
     },
     methods: {
         async exportPDF() {
-            this.showLoader = true;
+            try {
+                this.showLoader = true;
 
-            // If user has not used the calculator thus no data.
-            if(!window.localStorage.getItem("app_diary")) return window.alert('No data available!');
-            const diary = JSON.parse(window.localStorage.getItem("app_diary"));
+                // If user has not used the calculator thus no data.
+                if(!window.localStorage.getItem("app_diary")) return window.alert('No data available!');
+                const diary = JSON.parse(window.localStorage.getItem("app_diary"));
 
-            // Create PDF doc
-            const doc = new jsPDF();
+                // Create PDF doc
+                const doc = new jsPDF();
 
-            // Test Data // Comment out or remove in production.
-            // generateFakeDiary(100);
+                // Test Data // Comment out or remove in production.
+                // generateFakeDiary(100);
 
-            // Branding & Title
-            doc.addImage(require("../../assets/images/icons/logo.png"), "JPEG", 14, 10, 30, 30);
+                // Branding & Title
+                doc.addImage(require("../../assets/images/icons/logo.png"), "JPEG", 14, 10, 30, 30);
 
-            doc.setFontSize(30);
-            doc.setFont("Helvetica", "Bold");
+                doc.setFontSize(30);
+                doc.setFont("Helvetica", "Bold");
 
-            doc.text("Bolus Calculator", 53, 23);
+                doc.text("Bolus Calculator", 53, 23);
 
-            doc.setFontSize(20);
-            doc.setFont("Helvetica", "");
+                doc.setFontSize(20);
+                doc.setFont("Helvetica", "");
 
-            doc.text("Application Data", 53, 33);
+                doc.text("Application Data", 53, 33);
 
 
-            // analytic data.
+                // analytic data.
 
-            const now = Temporal.Now.plainDateTimeISO();
-            const sevenDaysPrior = now.subtract({days: 7}); // Last 30 days.
-            const thirtyDaysPrior = now.subtract({days: 30}); // Last 30 days.
+                const now = Temporal.Now.plainDateTimeISO();
+                const sevenDaysPrior = now.subtract({days: 7}); // Last 30 days.
+                const thirtyDaysPrior = now.subtract({days: 30}); // Last 30 days.
 
-            // last 30 days.
-            this.generateReportBlock("Previous 7 days.", doc, diary, sevenDaysPrior, now, 61.5);
+                // last 30 days.
+                this.generateReportBlock("Previous 7 days.", doc, diary, sevenDaysPrior, now, 61.5);
 
-            doc.addPage();
+                doc.addPage();
 
-            // last 30 days.
-            this.generateReportBlock("Previous 30 days.", doc, diary, thirtyDaysPrior, now, 15);
+                // last 30 days.
+                this.generateReportBlock("Previous 30 days.", doc, diary, thirtyDaysPrior, now, 15);
 
-            doc.addPage();
+                doc.addPage();
 
-            // All time.
-            this.generateReportBlock("All time.", doc, diary, null, now, 15);
+                // All time.
+                this.generateReportBlock("All time.", doc, diary, null, now, 15);
 
-            doc.save();
-            // await this.savePDF(doc);
+                await this.savePDF(doc);
+                this.showLoader = false;
+            } catch (error) {
+                this.showLoader = false;
+
+                handleError("An error occurred while generating your report.", error);
+            }
         },
 
         async savePDF(doc) {
@@ -143,8 +150,6 @@ export default {
             });
 
             const path = uriResult.uri;
-
-            this.showLoader = false;
             
             // Not an ideal solution, but works for now. // https://stackoverflow.com/questions/67943445/capacitor-3-and-vuejs-open-saved-file-or-download?newreg=e131f0a8e4b94d3abb69fa01ea38642c
             await Share.share({
@@ -261,7 +266,7 @@ export default {
             if(analyticsResult.results.averages.mean.bloodGlucose < minBloodSugar) doc.setTextColor(139, 0, 0);
 
             doc.setFontSize(20);
-            doc.text(`${analyticsResult.results.averages.mean.bloodGlucose ? analyticsResult.results.averages.mean.bloodGlucose.toFixed(1) + " mmol/L" : "N/A mmol/L"}`, 87, yAxis);
+            doc.text(`${analyticsResult.results.averages.mean.bloodGlucose ? analyticsResult.results.averages.mean.bloodGlucose.toFixed(1) + secureStorage.retrieve.bloodSugarUnit() : `N/A ${secureStorage.retrieve.bloodSugarUnit()}`}`, 87, yAxis);
 
             yAxis += 10;
             

@@ -55,7 +55,7 @@ export default class OpenFoodFactsController extends SuperController {
         .filter(product => product.name && product.weight && product.carbs); // required fields
 
         // i.e. 1 Result(s) (36.10 ms)
-        this.createMessage(`${results.length} ${results.length > 1 ? "Results" : "Result"} (${(stopwatch.stop()).toFixed(2)} ms)`);
+        if(results.length) this.createMessage(`${results.length} ${results.length > 1 ? "Results" : "Result"} (${(stopwatch.stop()).toFixed(2)} ms)`);
         
         return results;
     }

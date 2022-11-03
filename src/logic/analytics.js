@@ -66,6 +66,8 @@ export class Analytics {
      * @example average("bloodGlucose", 'mean'); 
      */
     average(property, type) {
+        if(!this.diary.length) return this;
+        
         if(isNaN(this.diary[0][property])) throw new Error("Average requires numeric values.");
 
         switch (type) {
