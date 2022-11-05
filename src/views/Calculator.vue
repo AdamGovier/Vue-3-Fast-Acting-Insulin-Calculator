@@ -149,8 +149,7 @@
                 if(this.values.carbohydrates >= this.$safety.carbohydratesGuidance.max) 
                     this.errors.carbohydrates = "This seems like a large number of carbohydrates, are you sure this is correct?";
 
-                // Hardcoded hypo level right now.
-                if(this.values.bloodGlucose && this.values.bloodGlucose < 4.0 && !window.localStorage.getItem('app_warning_hypo_never_show'))
+                if(this.values.bloodGlucose && this.values.bloodGlucose < secureStorage.retrieve.minBlood() && !JSON.parse(window.localStorage.getItem('app_warning_hypo_never_show')))
                     this.panels.warning = true;
 
                 const selectedModifiers = this.modifiers.filter(modifier => modifier.checked);

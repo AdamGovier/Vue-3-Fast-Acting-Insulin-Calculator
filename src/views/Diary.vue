@@ -8,7 +8,7 @@
         </div>
 
         <fieldset v-if="diaryEntries.length" style="margin: 2.5%; margin-top: 20px;"> 
-            <legend style="padding: 0 10px;">Average 11.0 mmol/L</legend>
+            <legend style="padding: 0 10px;">Average: {{this.average}} {{this.bloodSugarUnit}}</legend>
             <!--Arguably should not use a fieldset outside of a form but the css for a fake fieldset is ugly https://stackoverflow.com/questions/2213881/is-it-possible-to-achieve-a-fieldset-like-effect-without-using-the-fieldset-->
             <DiaryBlock v-for="entry in diaryEntries" :entry="entry" />
         </fieldset>
@@ -28,6 +28,8 @@
 <script>
 import DiaryBlock from "../components/Diary/DiaryBlock.vue";
 import MenuItem from "../components/menu/MenuItem.vue";
+import secureStorage from "../logic/secureStorage";
+import averages from "../logic/analytics/averages";
 
 import { getDiaryEntries } from '../logic/diary';
 
@@ -38,7 +40,8 @@ export default {
     },
     data() {
         return {
-            date: Temporal.Now.plainDateTimeISO()
+            date: Temporal.Now.plainDateTimeISO(),
+            bloodSugarUnit: secureStorage.retrieve.bloodSugarUnit()
         }
     },
     methods: {
@@ -60,6 +63,9 @@ export default {
         },
         diaryEntries() {
             return getDiaryEntries(this.date);
+        },
+        average() {
+            return averages.getMean(this.diaryEntries, "bloodGlucose").toFixed(1);
         }
     }
 }

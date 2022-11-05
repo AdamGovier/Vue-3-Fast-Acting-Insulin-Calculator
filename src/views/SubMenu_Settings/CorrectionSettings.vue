@@ -45,7 +45,7 @@
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
-                        The minimum blood sugar/blood glucose level before starting to reduce the insulin dose.
+                        The blood sugar/blood glucose level at hypoglycaemia occurs.
                     </template>
                 </OptionLabel>
             </Option>

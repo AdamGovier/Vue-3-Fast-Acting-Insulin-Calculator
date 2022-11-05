@@ -10,8 +10,10 @@
             <p style="color: var(--action-colour); font-size: 18px; margin-top: 15px; width: 100%;">( Low Blood Sugar )</p>
         </PanelHeader>
 
+        <br/>
+
         <p>
-            Addapted from the <a class="text-link" href="https://www.nhs.uk/conditions/low-blood-sugar-hypoglycaemia/">NHS</a> - 
+            Addapted from the <a class="text-link" href="https://www.nhs.uk/conditions/low-blood-sugar-hypoglycaemia/">NHS</a> 
             <!-- Additional source: https://www.mkuh.nhs.uk/patient-information-leaflet/treatment-for-mild-hypoglycaemia -->
         </p>
         <br/>
@@ -25,6 +27,11 @@
         <br/>
         <p>
             3.) <strong>Have a snack</strong> that contains 10-15g's of slow-release carbohydrate, such as a slice of bread or toast, a couple of biscuits, or a glass of cows' milk.
+        </p>
+
+        <br/>
+        <p>
+            <span>If you have over corrected, You should <strong>avoid</strong> taking any insulin until your blood glucose level are back between range.</span>
         </p>
 
         <BtnPrimary value="Remind me to test again in 10 minutes." @click="remindMe();" />
@@ -90,10 +97,9 @@ export default {
                 notifications: [
                     {
                         title: "Hypo Reminder",
-                        body: "Please test your blood glucose levels.",
+                        body: "Please retest your blood glucose levels.",
                         id: 1,
                         schedule: { at: new Date(Date.now() + (15 * 60 * 1000)) }, // 15 mins.
-                        actionTypeId: "",
                         extra: null,
                         sound: "alarm.wav",
                         ongoing: true

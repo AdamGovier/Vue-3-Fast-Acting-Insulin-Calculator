@@ -19,7 +19,6 @@
 <script>
 export default {
     emits: ['close'],
-    // Scroll lock broken, on the todo list.
     mounted() { // Prevents scrolling behind the panel.
         this.emitter.emit("lock-scroll", true);
     },

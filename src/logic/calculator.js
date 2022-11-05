@@ -11,10 +11,9 @@ export function calculate(values) {
     if(values.carbohydrates) dose += carbs2Insulin(values.carbohydrates);
     if(values.bloodGlucose) dose += bloodSugarDoseCalc(values.bloodGlucose);
     if(values.modifiers.length) dose = handleModifiers(values.modifiers, dose);
-    console.log(values.additionalUnits, dose)
-    // Manually add units. i.e. Sick Day Rules.
+
+    // Manually add units. i.e. Sick Day Rules. (Not affected by modification settings).
     if(values.additionalUnits) dose += values.additionalUnits;
-    console.log(values.additionalUnits, dose)
 
 
     //round to nearest 0.25;
@@ -23,11 +22,19 @@ export function calculate(values) {
     return dose >= 0 ? dose : "0.00";
 }
 
+/**
+ * Allows modification settings to alter total dose.
+ * @param {Array} modifiers An array of modifier objects.
+ * @param {Number} dose The dose to provide calculations on.
+ * @returns {Number} dose
+ */
 const handleModifiers = (modifiers, dose) => {
     let doseModificationTotal = 0;
 
     modifiers.forEach(modifier => {
         const doseChange = (dose / 100) * modifier.percentage;;
+
+        // Add or deduct percentage from original dose.
         modifier.addition ? doseModificationTotal += doseChange : doseModificationTotal -= doseChange;
     });
 
@@ -39,22 +46,12 @@ const handleModifiers = (modifiers, dose) => {
  * @param {Number} carbohydrates  
  */
  const carbs2Insulin = (carbohydrates) => {
-    /**
-     * Checks if the numberOfCarbs provided is not of an extreme quantity.
-     */
-
-    // if(validate.numberOfCarbs(numberOfCarbs).error) {
-    //     throwUserError(validate.numberOfCarbs(numberOfCarbs).reason);
-    //     throw "Invalid Carbohydrate Entree";
-    // }
-
+    // Extreme quantities are now handled in runCalculations() in Calculator.vue.
 
     /**
-     * Checks if the value "carbRatio" is stored within the app's local storage. Just incase of data corruption or something similar.
+     * Checks if the value "carbRatio" is stored within the app's local storage with the addition of safety checks, just incase of data corruption or something similar.
      */
     const carbRatio = currentCarbRatio();
-    console.log(carbRatio);
-    // checkValue(carbRatio, "carbRatio");
 
     /**
      * https://www.nhstayside.scot.nhs.uk/OurServicesA-Z/DiabetesOutThereDOTTayside/PROD_263751/index.htm 
@@ -73,19 +70,18 @@ const handleModifiers = (modifiers, dose) => {
  */
 const bloodSugarDoseCalc = (bloodGlucose) => {
     // These are very long variable names however I think it is important that they are clear on what they store.
-    const minimumBloodGlucoseBeforeDoseDecrease = secureStorage.retrieve.minBlood();
-    const maximumBloodGlucoseBeforeDoseIncrease = secureStorage.retrieve.maxBlood();
+    const highBloodGlucoseTolerance = secureStorage.retrieve.maxBlood();
 
     const targetBloodSugar = secureStorage.retrieve.targetBloodSugar();
     const correctionFactor = secureStorage.retrieve.correctionFactor();
 
-    if(bloodGlucose < minimumBloodGlucoseBeforeDoseDecrease || bloodGlucose > maximumBloodGlucoseBeforeDoseIncrease) {
+    if(bloodGlucose > highBloodGlucoseTolerance) {
         /**
          * Forumla sourced from https://www.nhstayside.scot.nhs.uk/OurServicesA-Z/DiabetesOutThereDOTTayside/PROD_263751/index.htm
          * (Current Blood Glucose Level - Target Blood Sugar) then divided by the correctionFactor.
         */
         return (bloodGlucose - targetBloodSugar) / correctionFactor;
-    } else { // If bloods within range do not add a correction dose.
+    } else { // If bloods are not of a high blood glucose level, do not add a correction dose.
         return 0;
     }
 }

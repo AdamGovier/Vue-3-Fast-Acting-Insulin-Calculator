@@ -44,7 +44,7 @@
     "yesno-dialog": "^0.2.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.23.1",
+    "@playwright/test": "^1.27.1",
     "@types/node": "^17.0.30",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
