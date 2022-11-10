@@ -4,7 +4,9 @@
             <i class="fas fa-arrow-circle-left" @click="goBackOneDay();"></i>
             <p>{{ renderDate }}</p>
             <i class="far fa-calendar-alt"></i>
-            <i class="fas fa-arrow-circle-right" @click="goForwardOneDay();"></i>
+
+            <!-- Show a no entry symbol if current date is today. i.e. you cannot go into the future. -->
+            <i class="fas" :class="{'fa-arrow-circle-right': !isToday, 'fa-ban': isToday}" @click="goForwardOneDay();"></i>
         </div>
 
         <fieldset v-if="diaryEntries.length" style="margin: 2.5%; margin-top: 20px;"> 
@@ -32,6 +34,7 @@ import secureStorage from "../logic/secureStorage";
 import averages from "../logic/analytics/averages";
 
 import { getDiaryEntries } from '../logic/diary';
+import { isSameDate } from "../logic/utilities";
 
 export default {
     components: {
@@ -49,6 +52,7 @@ export default {
            this.date = this.date.subtract({days:1})
         },
         goForwardOneDay() {
+            if(this.isToday) return; // Don't allow to skip into the future.
             this.date = this.date.add({days:1})
         }
     },
@@ -66,6 +70,9 @@ export default {
         },
         average() {
             return averages.getMean(this.diaryEntries, "bloodGlucose").toFixed(1);
+        },
+        isToday() {
+            return isSameDate(this.date, Temporal.Now.plainDateTimeISO());
         }
     }
 }

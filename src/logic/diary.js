@@ -1,3 +1,5 @@
+import {isSameDate} from "./utilities";
+
 const storage = window.localStorage;
 
 /**
@@ -20,7 +22,6 @@ export function addEntry(entry) {
  * @param Object Temporal Date Object. 
  */
 export function getDiaryEntries(queryDate) {
-    // console.log(date);
     const storage = window.localStorage;
     
     if(!storage.getItem("app_diary")) return [];
@@ -33,8 +34,8 @@ export function getDiaryEntries(queryDate) {
             // Create date object from entry
             const entryDate = new Temporal.PlainDateTime.from(entry.timestamp); 
 
-            // If entryDate is 0 days since the queryDate return the entry.
-            if(entryDate.since(queryDate).days === 0) return entry;
+            // if entryDate is the same as queryDate in terms of dd/mm/yyyy.
+            if(isSameDate(queryDate, entryDate)) return entry;
         }
     );
 }
