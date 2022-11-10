@@ -25,9 +25,17 @@ export default class PublicController extends SuperController {
             // Set the value to either barcode or keyword.
             const searchValue = this.filters.barcode ??= this.filters.searchTerm;
 
-            // The domain is provided in main.js under config.globalProperties.$endpoint.
-            const response = await axios.get(`${app.config.globalProperties.$endpoint}/api/hotshots/get/${inputType}/${searchValue}`);
+            // Request timeout if for example server is down and request doesn't make it through.
+            const abortController = new AbortController();
 
+            setTimeout(() => abortController.abort(), app.config.globalProperties.$timeout);
+
+            // The domain is provided in main.js under config.globalProperties.$endpoint.
+            const response = await axios.get(`${app.config.globalProperties.$endpoint}/api/hotshots/get/${inputType}/${searchValue}`, {
+                signal: abortController.signal
+            });
+
+            
             // If no response set it to an empty array.
             const hotshots = response.data ? createHotshots(response.data) : [];
 

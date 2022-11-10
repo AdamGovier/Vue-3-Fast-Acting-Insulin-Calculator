@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import axios from "axios";
 
 import mitt from 'mitt'; // https://stackoverflow.com/questions/63471824/vue-js-3-event-bus
 
@@ -29,6 +30,10 @@ app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
 app.config.globalProperties.$tos_version = "1.9";
 app.config.globalProperties.$build_no = "3.3.11";
+
+// Total request & response timeout. i.e. 5000 -> 5s to complete request & response before timeout.
+app.config.globalProperties.$timeout = 5000; // 5s
+
 
 // Bolus Calculator API Endpoint.
 app.config.globalProperties.$endpoint = "http://90.220.55.219:802";
@@ -110,6 +115,9 @@ app.config.globalProperties.$safety = {
     }
 }
 // End of safety constraints.
+
+// Set response timeout.
+axios.defaults.timeout = app.config.globalProperties.$timeout;
 
 app.config.globalProperties.emitter = emitter;
 

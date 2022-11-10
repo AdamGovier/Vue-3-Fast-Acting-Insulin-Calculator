@@ -6,6 +6,7 @@ import SuperController from "./SuperController.js";
 import Hotshot from "./Hotshot.js";
 import axios from "axios";
 import Stopwatch from "statman-stopwatch";
+import app from "@/main.js";
 
 export default class OpenFoodFactsController extends SuperController {
     constructor(createMessage) {
@@ -23,7 +24,14 @@ export default class OpenFoodFactsController extends SuperController {
         let data;
 
         try {
-            response = await axios.get(url);
+            // Request timeout if for example server is down and request doesn't make it through.
+            const abortController = new AbortController();
+
+            setTimeout(() => abortController.abort(), app.config.globalProperties.$timeout);
+
+            response = await axios.get(url, {
+                signal: abortController.signal
+            });
 
             if(!response.data) throw new Error("No response given.");
             data = response.data; 
