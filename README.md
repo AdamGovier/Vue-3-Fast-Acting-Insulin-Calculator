@@ -12,7 +12,7 @@ The application is not ready for general use.
 
 ### Finished:
 
-* ✅ Original [Bolus-Calculator](https://github.com/AdamGovier/Bolus-Calculator) fully ported to Vue & Ionic.
+* ✅ The original [Bolus-Calculator](https://github.com/AdamGovier/Bolus-Calculator) fully ported to Vue & Ionic.
 * ✅ Many new features added.
 * ✅ Base application almost finished.
 
