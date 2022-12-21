@@ -12,9 +12,9 @@ The application is not ready for general use.
 
 ### Finished:
 
-* ✅ The original [Bolus-Calculator](https://github.com/AdamGovier/Bolus-Calculator) fully ported to Vue & Ionic.
-* ✅ Many new features added.
-* ✅ Base application almost finished.
+* ✅ The original [Bolus-Calculator](https://github.com/AdamGovier/Bolus-Calculator) has been fully ported to Vue & Ionic.
+* ✅ Many new features have been added.
+* ✅ The base application is almost finished.
 
 ### Underworks:
 
@@ -85,7 +85,7 @@ npx cap add ios
 npx cap open ios
 ```
 
-or alternativelyalternativl, run the app directly from the Command-Line using:
+or alternatively, run the app directly from the Command-Line using:
 
 ```
 npx cap run ios
