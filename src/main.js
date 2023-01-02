@@ -36,7 +36,7 @@ app.config.globalProperties.$timeout = 5000; // 5s
 
 
 // Bolus Calculator API Endpoint.
-app.config.globalProperties.$endpoint = "http://90.220.55.219:802";
+app.config.globalProperties.$endpoint = "http://goves.co.uk:802";
 
 app.config.globalProperties.$hotshots = {
 

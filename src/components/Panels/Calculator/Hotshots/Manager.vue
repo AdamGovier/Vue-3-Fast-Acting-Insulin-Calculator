@@ -214,7 +214,8 @@ export default {
             axios.post(`${this.$endpoint}/api/hotshots/create`, body, {
                 headers: {
                     'content-type': 'multipart/form-data'
-                }
+                },
+                timeout: 20000 // Increased the default timeout as uploading files.
             });
         },
         deleteHotshot() {
