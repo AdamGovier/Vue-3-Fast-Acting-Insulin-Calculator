@@ -2,12 +2,13 @@
     <div class="hotshot">
         <div class="head">
             <p v-if="!selected">{{ hotshot.carbs }}g of Carbs</p>
-            <p v-if="selected">{{ roundPointFive(hotshot.carbs * selected)}}g {{ selected }}x</p>
+            <p v-if="selected">{{ roundPointFive(hotshot.carbs * selected) }}g {{ selected }}x</p>
         </div>
 
         <div class="thumbnail" :style="`background-image: url('${hotshot.img ?? require('@/assets/images/hotshots/no-image.webp')}');`">
-            <span style="border-radius: 0 5px 0 0;">{{ hotshot.name }}</span>
-            <span style="border-radius: 5px 0 0 0;">{{ hotshot.weight }}g</span>
+            <span style="border-radius: 0 5px 0 0; max-width: 52.5%;">{{ hotshot.name }}</span>
+            <!-- Weight + Unit: i.e, 56g. -->
+            <span style="border-radius: 5px 0 0 0; text-align: right;">{{ hotshot.weight }} {{weightUnit}}</span>
         </div>
 
         <button v-if="editEnabled && !selected" @click="this.$emit('edit', hotshot);" class="hotshotBtn edit">
@@ -82,6 +83,12 @@ export default {
     props: ['hotshot', 'selected', 'editEnabled'],
     methods: {
         roundPointFive
+    },
+    computed: {
+        weightUnit() {
+            const unitId = this.hotshot.weightUnit;
+            return this.$weight_units.find(unit => unit.unitId === unitId).shorthand;
+        }
     }
 }
 </script>
