@@ -32,7 +32,9 @@
             <Option title="Weight">
                 <InputArea>
                     <Input :value="values.weight" @new-data="weight => values.weight = weight" type="number" placeholder="0"/>
-                    <InputLabel value="g" single="true" />
+                    <select @change="e => values.weightUnit = e.target.value">
+                        <option v-for="unit in $weight_units" :value="unit.unitId" :selected="values.weightUnit === unit.unitId">{{unit.name}} ({{unit.shorthand}})</option>
+                    </select>
                 </InputArea>
                 <OptionLabel>
                     <template v-slot:content>
@@ -79,6 +81,13 @@
 
         font-size: 35px;
     }
+
+    select {
+        height: 40px;
+        padding-left: 10px;
+        background-color: var(--tertiary-colour);
+        color: white;
+    }
 </style>
 
 <script>
@@ -122,6 +131,7 @@ export default {
                 name: null,
                 carbohydrates: null,
                 weight: null,
+                weightUnit: "weight_grams",
                 img: null,
                 imageWebPath: null,
                 barcode: null
@@ -145,6 +155,7 @@ export default {
         this.values.name = this.hotshot.name;
         this.values.carbohydrates = this.hotshot.carbs;
         this.values.weight = this.hotshot.weight;
+        this.values.weightUnit = this.hotshot.weightUnit;
 
         // Render preview photo.
         if(this.hotshot.imgFilename) {
@@ -174,7 +185,7 @@ export default {
             if(storage.getItem("app_local_hotshots")) hotshots = JSON.parse(storage.getItem("app_local_hotshots"));
 
             if(this.hotshot) { // If edit, remove original hotshot from array.
-                hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id)
+                hotshots = hotshots.filter(hotshot => hotshot.id !== this.hotshot.id);
             }
 
             hotshots.push({
@@ -182,6 +193,7 @@ export default {
                 name: this.values.name,
                 carbs: this.values.carbohydrates,
                 weight: this.values.weight,
+                weightUnit: this.values.weightUnit,
                 img: this.values.img,
                 barcode: this.values.barcode
             });

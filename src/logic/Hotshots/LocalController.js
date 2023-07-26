@@ -40,7 +40,7 @@ export default class LocalContoller extends SuperController {
         let hotshots = (await Promise.all(hotshotPromises)).reverse();
 
         // Bind to hotshot template.
-        hotshots = hotshots.map(hotshot => new Hotshot(hotshot.id, hotshot.name, hotshot.carbs, hotshot.weight, hotshot.img, hotshot.barcode));
+        hotshots = hotshots.map(hotshot => new Hotshot(hotshot.id, hotshot.name, hotshot.carbs, hotshot.weight, hotshot.img, hotshot.barcode, hotshot.weightUnit));
 
         // Conditional these functions will return original results if second argument is empty (undefined || null).
         hotshots = searchByTerm(hotshots, this.filters.searchTerm);
@@ -50,7 +50,7 @@ export default class LocalContoller extends SuperController {
         if(hotshots.length) this.createMessage(`${hotshots.length} ${hotshots.length > 1 ? "Results" : "Result"}`);
         
         // This might look bizarre but this is more of a physiological feature rather than a practical function. 
-        // I found that when searching for a hotshot this function would show the results so fast my brain instantly would not realise the search
+        // I found that when searching for a hotshot this function would show the results so fast that my brain would not instantly realise the search
         // occured at all. So a subtle delay allows a loading spinner to show before the results are presented hinting at the user that a
         // search has occured. 
         if(this.filters.searchTerm || this.filters.barcode) await new Promise(resolve => setTimeout(resolve, 150));

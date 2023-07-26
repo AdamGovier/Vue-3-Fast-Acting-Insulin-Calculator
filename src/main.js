@@ -28,15 +28,38 @@ app.config.globalProperties.$authorLink = "https://adamgovier.co.uk";
 
 // App global configurations.
 
+app.config.globalProperties.$weight_units = [
+    {
+        unitId: "weight_grams",
+        name: "grams",
+        shorthand: "g"
+    },
+    {
+        unitId: "weight_milliliters",
+        name: "milliliters",
+        shorthand: "ml"
+    },
+    {
+        unitId: "weight_cups",
+        name: "cups",
+        shorthand: "cup(s)"
+    },
+    {
+        unitId: "weight_fraction",
+        name: "fraction",
+        shorthand: "x/y"
+    }
+];
+
 app.config.globalProperties.$tos_version = "1.9";
 app.config.globalProperties.$build_no = "3.3.11";
 
 // Total request & response timeout. i.e. 5000 -> 5s to complete request & response before timeout.
-app.config.globalProperties.$timeout = 5000; // 5s
+app.config.globalProperties.$timeout = 100000; 
 
 
 // Bolus Calculator API Endpoint.
-app.config.globalProperties.$endpoint = "http://goves.co.uk:802";
+app.config.globalProperties.$endpoint = "http://localhost:3000";
 
 app.config.globalProperties.$hotshots = {
 

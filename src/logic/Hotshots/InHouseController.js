@@ -63,6 +63,6 @@ function createHotshots(unparsedHotshots) {
         entry.img = `${app.config.globalProperties.$endpoint}/api/hotshots/thumbnail/${entry.imagePath}`; 
 
         // Apply to template
-        return new Hotshot(entry.id, entry.name, entry.carbs, entry.weight, entry.img, entry.barcode);
+        return new Hotshot(entry.id, entry.name, entry.carbs, entry.weight, entry.img, entry.barcode, entry.weightUnit);
     }).reverse(); 
 }
