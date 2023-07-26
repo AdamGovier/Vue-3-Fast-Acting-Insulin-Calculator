@@ -55,11 +55,11 @@ app.config.globalProperties.$tos_version = "1.9";
 app.config.globalProperties.$build_no = "3.3.11";
 
 // Total request & response timeout. i.e. 5000 -> 5s to complete request & response before timeout.
-app.config.globalProperties.$timeout = 10000; // 5s
+app.config.globalProperties.$timeout = 100000; 
 
 
 // Bolus Calculator API Endpoint.
-app.config.globalProperties.$endpoint = "http://goves.co.uk:802";
+app.config.globalProperties.$endpoint = "http://localhost:3000";
 
 app.config.globalProperties.$hotshots = {
 

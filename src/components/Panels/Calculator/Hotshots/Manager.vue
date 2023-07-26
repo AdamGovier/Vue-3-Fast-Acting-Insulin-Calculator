@@ -33,7 +33,7 @@
                 <InputArea>
                     <Input :value="values.weight" @new-data="weight => values.weight = weight" type="number" placeholder="0"/>
                     <select @change="e => values.weightUnit = e.target.value">
-                        <option v-for="unit in $weight_units" :value="unit.unitId">{{unit.name}} ({{unit.shorthand}})</option>
+                        <option v-for="unit in $weight_units" :value="unit.unitId" :selected="values.weightUnit === unit.unitId">{{unit.name}} ({{unit.shorthand}})</option>
                     </select>
                 </InputArea>
                 <OptionLabel>

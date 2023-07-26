@@ -8,7 +8,10 @@
         <div class="thumbnail" :style="`background-image: url('${hotshot.img ?? require('@/assets/images/hotshots/no-image.webp')}');`">
             <span style="border-radius: 0 5px 0 0; max-width: 52.5%;">{{ hotshot.name }}</span>
             <!-- Weight + Unit: i.e, 56g. -->
-            <span style="border-radius: 5px 0 0 0; text-align: right;">{{ hotshot.weight }} {{weightUnit}}</span>
+            <span style="border-radius: 5px 0 0 0; text-align: right;">
+                <div v-if="hotshot.weightUnit !== null">{{ hotshot.weight }} {{weightUnit}}</div>
+                <div v-else>{{ hotshot.weight }}</div>
+            </span>
         </div>
 
         <button v-if="editEnabled && !selected" @click="this.$emit('edit', hotshot);" class="hotshotBtn edit">

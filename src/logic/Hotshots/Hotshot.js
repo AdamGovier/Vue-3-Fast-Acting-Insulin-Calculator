@@ -8,7 +8,8 @@ export default class Hotshot {
         this.weight = weight;
         this.img = img;
         this.barcode = barcode;
-        this.weightUnit = weightUnit ?? "weight_grams";
+        // Null = do not show a unit, that is why the code is not using "weightUnit ?? 'weight_grams'".
+        this.weightUnit = weightUnit !== undefined ? weightUnit : "weight_grams";
     }
 
     static generateID() {
